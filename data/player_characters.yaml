@@ -1,0 +1,30 @@
+---
+name: ExampleCharacter
+soul:
+  odin_favor: 100
+
+  tactics: 100
+  lore: 100
+  perception: 100
+  investigation: 100
+  deduction: 100
+
+  thor_favor: 100
+
+  power: 100
+  athletics: 100
+  healing: 100
+  intimidation: 100
+  performance: 100
+
+  loki_favor: 100
+
+  accuracy: 100
+  speed: 100
+  persuasion: 100
+  deception: 100
+  stealth: 100
+body:
+  body_plan: tailless_humanoid
+  scaler: 1
+---

@@ -1,0 +1,348 @@
+---
+name: organic_brain
+material: fleshy
+blood_percentage: 15
+injury_timings:
+  critical:
+    unconscious:
+      onset: 1
+      recovery: 3600
+      likelihood: 99
+    death:
+      onset: 20
+      likelihood: 95
+  major:
+    confusion:
+      onset: 1
+      recovery: 604800
+      severity: 100
+      likelihood: 95
+    nausea:
+      onset: 1
+      recovery: 604800
+      severity: 40
+      likelihood: 95
+    unconscious:
+      onset: 1
+      recovery: 600
+      likelihood: 95
+    death:
+      onset: 1200
+      likelihood: 50
+  moderate:
+    confusion:
+      onset: 1
+      recovery: 86400
+      severity: 80
+      likelihood: 50
+    nausea:
+      onset: 5
+      recovery: 86400
+      severity: 25
+      likelihood: 50
+    unconscious:
+      onset: 10
+      recovery: 30
+      likelihood: 50
+    death:
+      onset: 2400
+      likelihood: 5
+  minor:
+    unconscious:
+      onset: 10
+      recovery: 6
+      likelihood: 20
+    confusion:
+      onset: 1800
+      recovery: 43200
+      severity: 40
+      likelihood: 40
+    nausea:
+      onset: 1800
+      recovery: 43200
+      severity: 12
+      likelihood: 40
+    death:
+      onset: 4800
+      likelihood: .1
+---
+name: organic_liver
+material: fleshy
+blood_percentage: 27
+injury_timings:
+  critical:
+    recovery: 2592000
+    death:
+      onset: 432000
+      likelihood: 90
+    nausea:
+      onset: 1800
+      severity: 70
+      likelihood: 99
+    systemic_organ_failure:
+      onset: 1
+      severity: 100
+      likelihood: 95
+  major:
+    recovery: 1209600
+    nausea:
+      onset: 86400
+      severity: 50
+      likelihood: 95
+    death:
+      onset: 604800
+      likelihood: 50
+    systemic_organ_failure:
+      onset: 1
+      severity: 75
+      likelihood: 90
+  moderate:
+    recovery: 604800
+    nausea:
+      onset: 172800
+      severity: 40
+      likelihood: 90
+    death:
+      onset: 2592000
+      likelihood: 10
+    systemic_organ_failure:
+      onset: 1
+      severity: 40
+      likelihood: 50
+  minor:
+    recovery: 172800
+    nausea:
+      onset: 172800
+      severity: 5
+    systemic_organ_failure:
+      onset: 1
+      severity: 20
+      likelihood: 25
+---
+name: organic_heart
+material: fleshy
+blood_percentage: 100
+injury_timings:
+  critical:
+    recovery: 1209600
+    unconscious:
+      onset: 30
+      severity: 100
+      likelihood: 100
+    death:
+      onset: 600
+      likelihood: 99
+  major:
+    recovery: 1209600
+    unconscious:
+      onset: 120
+      severity: 95
+      likelihood: 99
+    death:
+      onset: 600
+      likelihood: 98
+  moderate:
+    recovery: 604800
+    unconscious:
+      onset: 180
+      severity: 90
+      likelihood: 98
+    death:
+      onset: 600
+      likelihood: 50
+  minor:
+    recovery: 259200
+    unconscious:
+      onset: 300
+      severity: 75
+      likelihood: 50
+    death:
+      onset: 86400
+      likelihood: 1
+---
+name: organic_lung
+material: fleshy
+blood_percentage: 100
+injury_timings:
+  critical:
+    recovery: 2419200
+    breathing_difficulty:
+      onset: 1
+      severity: 100
+      likelihood: 100
+  major:
+    recovery: 1814400
+    breathing_difficulty:
+      onset: 1
+      severity: 75
+      likelihood: 95
+  moderate:
+    recovery: 1209600
+    breathing_difficulty:
+      onset: 1
+      severity: 50
+      likelihood: 75
+  minor:
+    recovery: 604800
+    breathing_difficulty:
+      onset: 1
+      severity: 25
+      likelihood: 50
+---
+name: organic_stomach
+material: fleshy
+blood_percentage: 8
+injury_timings:
+  critical:
+    recovery: 1209600
+    nausea:
+      onset: 1
+      severity: 100
+      likelihood: 99
+    systemic_organ_failure:
+      onset: 1
+      severity: 60
+      likelihood: 50
+  major:
+    recovery: 604800
+    nausea:
+      onset: 1
+      severity: 90
+      likelihood: 95
+    systemic_organ_failure:
+      onset: 1
+      severity: 30
+      likelihood: 33
+  moderate:
+    recovery: 345600
+    nausea:
+      onset: 1
+      severity: 75
+      likelihood: 85
+    systemic_organ_failure:
+      onset: 1
+      severity: 10
+      likelihood: 12
+  minor:
+    recovery: 172800
+    nausea:
+      onset: 1
+      severity: 50
+      likelihood: 60
+    systemic_organ_failure:
+      onset: 1
+      severity: 5
+      likelihood: 5
+---
+name: organic_intestine
+material: fleshy
+blood_percentage: 8
+injury_timings:
+  critical:
+    recovery: 1209600
+    nausea:
+      onset: 1
+      severity: 90
+      likelihood: 95
+    systemic_organ_failure:
+      onset: 1
+      severity: 60
+      likelihood: 50
+  major:
+    recovery: 604800
+    nausea:
+      onset: 1
+      severity: 80
+      likelihood: 90
+    systemic_organ_failure:
+      onset: 1
+      severity: 30
+      likelihood: 33
+  moderate:
+    recovery: 345600
+    nausea:
+      onset: 1
+      severity: 60
+      likelihood: 80
+    systemic_organ_failure:
+      onset: 1
+      severity: 10
+      likelihood: 12
+  minor:
+    recovery: 172800
+    nausea:
+      onset: 1
+      severity: 40
+      likelihood: 60
+    systemic_organ_failure:
+      onset: 1
+      severity: 5
+      likelihood: 5
+---
+name: organic_kidney
+material: fleshy
+blood_percentage: 22
+injury_timings:
+  critical:
+    recovery: 2592000
+    death:
+      onset: 432000
+      likelihood: 90
+    systemic_organ_failure:
+      onset: 1
+      severity: 90
+      likelihood: 95
+  major:
+    recovery: 1209600
+    death:
+      onset: 604800
+      likelihood: 50
+    systemic_organ_failure:
+      onset: 1
+      severity: 65
+      likelihood: 90
+  moderate:
+    recovery: 604800
+    death:
+      onset: 2592000
+      likelihood: 10
+    systemic_organ_failure:
+      onset: 1
+      severity: 30
+      likelihood: 50
+  minor:
+    recovery: 172800
+    systemic_organ_failure:
+      onset: 1
+      severity: 10
+      likelihood: 25
+---
+name: organic_larynx
+material: fleshy
+blood_percentage: 100
+injury_timings:
+  critical:
+    recovery: 2419200
+    breathing_difficulty:
+      onset: 1
+      severity: 100
+      likelihood: 100
+  major:
+    recovery: 1814400
+    breathing_difficulty:
+      onset: 1
+      severity: 65
+      likelihood: 95
+  moderate:
+    recovery: 1209600
+    breathing_difficulty:
+      onset: 1
+      severity: 25
+      likelihood: 75
+  minor:
+    recovery: 604800
+    breathing_difficulty:
+      onset: 1
+      severity: 15
+      likelihood: 50
+---

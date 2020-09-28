@@ -1,0 +1,224 @@
+name: organic_head
+layers:
+  - name: skin
+    material: fleshy
+    thickness: 3
+  - name: muscle
+    material: fleshy
+    thickness: 3
+  - name: bone
+    material: bone
+    thickness: 10
+  - name: brain_cavity
+    material: fleshy
+    thickness: 60
+    organs:
+      - organic_brain:
+          relative_size: .95
+can_grasp: false
+---
+name: organic_neck
+layers:
+  - name: skin
+    material: fleshy
+    thickness: 2
+  - name: muscle
+    material: fleshy
+    thickness: 56
+  - name: bone
+    material: bone
+    thickness: 15
+full_length_organs:
+  - vein:
+      number: 2
+  - nerve:
+      number: 1
+  - tendon:
+      number: 6
+  - organic_larynx:
+      number: 1
+can_grasp: false
+---
+name: organic_upper_torso
+layers:
+  - name: skin
+    material: fleshy
+    thickness: 3
+  - name: muscle
+    material: fleshy
+    thickness: 10
+  - name: ribcage
+    material: bone
+    thickness: 45
+  - name: thoratic_cavity
+    material: fleshy
+    thickness: 125
+    organs:
+      - organic_lung:
+          relative_size: .45
+      - organic_lung:
+          relative_size: .45
+      - organic_heart:
+          relative_size: .1
+can_grasp: false
+---
+name: organic_upper_arm
+layers:
+  - name: skin
+    material: fleshy
+    thickness: 3
+  - name: muscle
+    material: fleshy
+    thickness: 31
+  - name: bone
+    material: bone
+    thickness: 10
+full_length_organs:
+  - vein:
+      number: 2
+  - nerve:
+      number: 1
+  - tendon:
+      number: 6
+can_grasp: false
+---
+name: organic_lower_arm
+layers:
+  - name: skin
+    thickness: 3
+    material: fleshy
+  - name: muscle
+    thickness: 21
+    material: fleshy
+  - name: bone
+    thickness: 10
+    material: bone
+full_length_organs:
+  - vein:
+      number: 2
+  - nerve:
+      number: 1
+  - tendon:
+      number: 6
+can_grasp: false
+---
+name: organic_hand
+layers:
+  - name: skin
+    thickness: 2
+    material: fleshy
+  - name: muscle
+    thickness: 2
+    material: fleshy
+  - name: bone
+    thickness: 4
+    material: bone
+full_length_organs:
+  - vein:
+      number: 2
+  - nerve:
+      number: 1
+  - tendon:
+      number: 6
+can_grasp: true
+---
+name: organic_lower_torso
+layers:
+  - name: skin
+    thickness: 4
+    material: fleshy
+  - name: muscle
+    thickness: 10
+    material: fleshy
+  - name: fat
+    thickness: 24
+    material: fleshy
+  - name: abdominal_cavity
+    thickness: 15
+    material: fleshy
+    organs:
+      - organic_lung:
+          relative_size: .45
+      - organic_lung:
+          relative_size: .45
+      - organic_heart:
+          relative_size: .1
+  - name: spine
+    thickness: 45
+    material: bone
+
+can_grasp: false
+---
+name: organic_upper_leg
+layers:
+  - name: skin
+    material: fleshy
+    thickness: 4
+  - name: muscle
+    material: fleshy
+    thickness: 100
+  - name: bone
+    material: bone
+    thickness: 15
+full_length_organs:
+  - vein:
+      number: 2
+  - nerve:
+      number: 1
+  - tendon:
+      number: 6
+can_grasp: false
+---
+name: organic_lower_leg
+layers:
+  - name: skin
+    material: fleshy
+    thickness: 3
+  - name: muscle
+    material: fleshy
+    thickness: 50
+  - name: bone
+    material: bone
+    thickness: 12
+full_length_organs:
+  - vein:
+      number: 2
+  - nerve:
+      number: 1
+  - tendon:
+      number: 6
+can_grasp: false
+---
+name: organic_foot
+layers:
+  - name: skin
+    material: fleshy
+    thickness: 3
+  - name: muscle
+    material: fleshy
+    thickness: 100
+  - name: bone
+    material: bone
+    thickness: 15
+full_length_organs:
+  - vein:
+      number: 2
+  - nerve:
+      number: 1
+  - tendon:
+      number: 6
+can_grasp: false
+---
+name: organic_tail
+layers:
+  - name: skin
+    thickness: 2
+    material: fleshy
+  - name: muscle
+    thickness: 5
+    material: fleshy
+  - name: bone
+    thickness: 5
+    material: bone
+can_grasp: false
+---

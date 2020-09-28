@@ -1,0 +1,51 @@
+---
+name: low_carbon_steel
+density: 8.05
+tensile_ult: 766
+tensile_yield: 572
+compressive_yield: 1480
+compressive_ult: 10000
+mod_of_elasticity: 202000
+shear_modulus: 79500
+strain_at_fracture: .202
+---
+name: med_carbon_steel
+density: 7.85
+tensile_ult: 987
+tensile_yield: 685
+compressive_yield: 1800
+compressive_ult: 10000
+mod_of_elasticity: 203000
+shear_modulus: 79600
+strain_at_fracture: .189
+---
+name: high_carbon_steel
+density: 7.5
+tensile_ult: 1010
+tensile_yield: 810
+compressive_yield: 2160
+compressive_ult: 10000
+mod_of_elasticity: 198000
+shear_modulus: 79900
+strain_at_fracture: .146
+---
+name: fleshy
+density: .985
+tensile_ult: .47
+tensile_yield: .42
+compressive_yield: .02
+compressive_ult: .1
+mod_of_elasticity: .266
+shear_modulus: .3
+strain_at_fracture: .85
+---
+name: bone
+density: 3.3
+tensile_ult: 130
+tensile_yield: 122
+compressive_yield: 170
+compressive_ult: 175
+mod_of_elasticity: 17600
+shear_modulus: 4000
+strain_at_fracture: .03
+---

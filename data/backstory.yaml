@@ -1,0 +1,302 @@
+- ID: father_profession
+  text: "Your father was... "
+  options:
+    viking:
+      text: "A viking raider, a man destined for Valhalla."
+      alignment_changes:
+        Thor: 10
+        Loki: 0
+        Odin: 0
+    jarl:
+      text: "A respected Jarl, he ruled over many men."
+      alignment_changes:
+        Thor: 0
+        Loki: 0
+        Odin: 10
+    foreign_council:
+      text: "A close advisor to the Jarl, he often gave advice regarding the affairs of others' lands, although how he gained his information is a mystery."
+      alignment_changes:
+        Thor: 0
+        Loki: 10
+        Odin: 0
+    lawyer:
+      text: "Found at the þing every year. He was often paid well to argue a man's case, and his silver tongue paired with his extensive knowledge of the law usually meant the lawspeaker sided with his client."
+      alignment_changes:
+        Thor: 0
+        Loki: 3
+        Odin: 3
+    bard:
+      text: "A well known þulr. His poems were repeated by many throughout Daneland, but to hear him perform them himself was a privilege anyone would pay for"
+      alignment_changes:
+        Thor: 3
+        Loki: 0
+        Odin: 3
+    poacher:
+      text: "A very successful hunter. No one else could find nearly as much game as he could within the legal boundaries, though he did live just on the border..."
+      alignment_changes:
+        Thor: 3
+        Loki: 3
+        Odin: 0
+- ID: father_reputation
+  text: "Your father was known for... "
+  options:
+    wise:
+      text: "His measured and considered response in all matters. Even those damaged by his decisions could not find fault with his reasoning."
+      alignment_changes:
+        Odin: 10
+        Thor: 0
+        Loki: 0
+    huge:
+      text: "His enormity. He towered over most men, and had bulging arms to match."
+      alignment_changes:
+        Odin: 0
+        Thor: 10
+        Loki: 0
+    silvertongue:
+      text: "His silver tongue. He could explain anything away, and change anyone's mind - much to the fury of many an injured party."
+      alignment_changes:
+        Odin: 0
+        Thor: 0
+        Loki: 10
+    tactics:
+      text: "His tactical genius. In every battle, he stood in the center of the shieldwall, trusting his battle plan to keep him safe."
+      alignment_changes:
+        Odin: 3
+        Thor: 3
+        Loki: 0
+    political:
+      text: "His ability to climb the political ladder. He knew everything there was to know about any opportunity. And if an opportunity didn't present itself? Why not create one?"
+      alignment_changes:
+        Odin: 3
+        Thor: 0
+        Loki: 3
+    womanizer:
+      text: "His way with women... any and all women. It's not known just how many divorces he caused."
+      alignment_changes:
+        Odin: 0
+        Thor: 3
+        Loki: 3
+- ID: child_game
+  text: "As a child, when your responsibilities were over, your favorite thing to do was..."
+  options:
+    chess:
+      text: "Play Hnefatafl with your father. Soon you were good enough to hold your own against even the best strategists."
+      alignment_changes:
+        Odin: 10
+        Thor: 0
+        Loki: 0
+      skill_changes:
+        tactics: 6
+        deduction: 4
+    climb:
+      text: "Climb trees in the nearby forest. Soon you could climb higher than all the other children - which only meant your falls were from higher."
+      alignment_changes:
+        Odin: 0
+        Thor: 10
+        Loki: 0
+      skill_changes:
+        power: 6
+        healing: 4
+    hide_and_seek:
+      text: "Play hide and seek with the other children. Often they would hear your run off in one direction, only for you to appear in the opposite direction when they gave up."
+      alignment_changes:
+        Odin: 0
+        Thor: 0
+        Loki: 10
+      skill_changes:
+        stealth: 6
+        deception: 4
+    story_time:
+      text: "Listen to your grandmother as she recited the stories of the gods and ancient heroes."
+      alignment_changes:
+        Odin: 3
+        Thor: 3
+        Loki: 0
+      skill_changes:
+        lore: 6
+        performance: 4
+    argue:
+      text: "Argue with the other children. You could easily tell what others thought and use it against them."
+      alignment_changes:
+        Odin: 3
+        Loki: 3
+        Thor: 0
+      skill_changes:
+        persuasion: 6
+        perception: 4
+    sports:
+      text: "Although it was frowned upon, you would organize games of Knattleikr between the children. Such a violent game was reserved for adults, but the rules rarely stopped you."
+      alignment_changes:
+        Odin: 0
+        Loki: 3
+        Thor: 3
+      skill_changes:
+        athletics: 6
+        speed: 4
+- ID: peace_role
+  text: "It takes a villiage to... well... run a villiage. Everyone needs to chip in, even during times of peace. To help out, you would often..."
+  options:
+    fact_gatherer:
+      text: "Investigate for the lawspeaker. Disputes often arise when people aren't united against a common enemy. When this happens it's up to the jarl and the lawspeaker to mediate, but to do this they need the facts. When those facts weren't immediately available, sometimes they would turn to you."
+      alignment_changes:
+        Odin: 10
+        Thor: 0
+        Loki: 0
+      skill_changes:
+        investigation: 6
+        deduction: 4
+    relay_threats:
+      text: "Pressure men to settle their disputes. Not all disputes were settled at the þing, and sometimes weak men can be too proud to admit fault. Occasionally your friends would ask you to... remind the guilty party of their obligations... forcefully."
+      alignment_changes:
+        Odin: 0
+        Thor: 10
+        Loki: 0
+      skill_changes:
+        intimidation: 6
+        performance: 4
+    water_hunter:
+      text: "Hunt small animals. Slaughtering your livestock for meat is not always the best use for such valuable assets. Fish and water foul offer a source of protein that's much easier on the purse - but you have to be fast."
+      alignment_changes:
+        Odin: 0
+        Thor: 0
+        Loki: 10
+      skill_changes:
+        accuracy: 6
+        speed: 4
+    deescalation:
+      text: "Deescalate fraught situations. Violence between families could be very dangerous in a Norse village. Blood feuds sometime last generations, and hurt everyone - not just those in the families. Rather than let it come to that, a quick word at just the right time can diffuse the tension. You just have to know the right time and the right word."
+      alignment_changes:
+        Odin: 3
+        Thor: 0
+        Loki: 3
+      skill_changes:
+        perception: 6
+        persuasion: 4
+    made_sacrifice:
+      text: "Make sacrifices to the gods. Every year the Valkyries would choose a few men from the raids to bring before Odin at Valhalla. A great honor, to be sure, but the men at Valhalla don't tend the livestock at your home, so you would perform a blót at their departure that Odin might give them a few more years to prove themselves before they feast in his longhouse."
+      alignment_changes:
+        Odin: 3
+        Loki: 0
+        Thor: 3
+      skill_changes:
+        healing: 6
+        lore: 4
+    petty_thief:
+      text: "Steal food. You had an insatiable appetite as a young man, and a small morsel here and there wouldn't be missed... Unless it was, and then you needed a sharp tongue or quick feet to avoid the blame."
+      alignment_changes:
+        Odin: 0
+        Loki: 3
+        Thor: 3
+      skill_changes:
+        deception: 6
+        athletics: 4
+- ID: war_role
+  text: "There are many facets to war, and fighting in the shieldwall is just one of them. You made yourself useful during violent times by..."
+  options:
+    battle_planner:
+      text: "Helping to create a plan. Running at the enemy head on works if you have the numbers, but a good commander needs to win even when he doesn't have the numbers. The stories of ancient battles still offer tactical insights today, so you learned all of them."
+      alignment_changes:
+        Odin: 10
+        Thor: 0
+        Loki: 0
+      skill_changes:
+        tactics: 6
+        lore: 4
+    shieldwall:
+      text: "Fighting in the shieldwall. Well, fighting in the shieldwall is a crucial part of war... if not an exceptionally original one. That said a battle can only be one with powerful men to hold the wall, and the bravest would leap over and disrupt them from behind."
+      alignment_changes:
+        Odin: 0
+        Thor: 10
+        Loki: 0
+      skill_changes:
+        power: 6
+        athletics: 4
+    archer:
+      text: "Shooting the enemy with a bow. Fighting in the shieldwall may be valorous, but it's also exceptionally dangerous. A man killed by an arrow is still dead, so you prefer to kill from a distance."
+      alignment_changes:
+        Odin: 0
+        Thor: 0
+        Loki: 10
+      skill_changes:
+        accuracy: 6
+        speed: 4
+    cursed_enemy:
+      text: "Cursing the enemy. Battles are Odin's sport - so why not appeal to him directly? If one side pleases him, he might be persuaded to put his thumb on the scales. But gaining his favor isn't easy, and the omens dictate what you must do. It takes skill to find and interpret those omens, and skill to perform the correct ritual. You've learned both."
+      alignment_changes:
+        Odin: 3
+        Thor: 3
+        Loki: 0
+      skill_changes:
+        investigation: 6
+        performance: 4
+    negotiator:
+      text: "Delivering and negotiating terms. No one needs to die if a decision can be reached before blades are drawn. When armies meet, it takes an intimidating presence and a sharp tongue to make one side back down without a fight. You have both."
+      alignment_changes:
+        Odin: 3
+        Loki: 3
+        Thor: 0
+      skill_changes:
+        intimidation: 6
+        persuasion: 4
+    spy:
+      text: "Spying on the enemy. A good general needs information before he commits men to battle. How many enemy face him, do they have the stomach to fight, are the well armed and armored? These are questions you've learned to answer, but you've got to get close, and learn to interpret what you see."
+      alignment_changes:
+        Odin: 3
+        Loki: 0
+        Thor: 3
+      skill_changes:
+        stealth: 6
+        deduction: 4
+- ID: profession
+  text: "There are times of war and times of peace, but through it all one must have a way to earn a living. You earned your money by..."
+  options:
+    leader:
+      text: "Becoming Jarl. Leading men isn't just a matter of telling them what to do. If too many people start to think you're unfair, they'll find someone else to lead them. That can't be good for you, so you've learned to be wise and fair, to get all the information you need for a decision, and to choose your battles carefully."
+      alignment_changes:
+        Odin: 10
+        Thor: 0
+        Loki: 0
+      skill_changes:
+        tactics: 2
+        investigation: 2
+        deduction: 2
+    gothi:
+      text: "Becoming a goði. Religion for a Dane is a generally private affair. But goðar are always needed for matters of the gods. The work of a goði is not easy, and you must have the ability to inspire and heal men, but also the strength to perform the sacrifice at the blót."
+      alignment_changes:
+        Odin: 0
+        Thor: 10
+        Loki: 0
+      skill_changes:
+        power: 2
+        healing: 2
+        performance: 2
+    game_hunter:
+      text: "Becoming a hunter. Hunting game is a game of hnefatafl between you and your prey. It must always think you're somewhere else - and when you shoot, you can't miss."
+      alignment_changes:
+        Odin: 0
+        Thor: 0
+        Loki: 10
+      skill_changes:
+        accuracy: 2
+        deception: 2
+        stealth: 2
+    healer:
+      text: "Healing men in battle. When men are injured in battle it takes a lot of luck, or the skill to understand the wound, the knowledge of how to fix it, and the speed to act quickly when seconds matter. Your time healing injured men has given these to you."
+      alignment_changes:
+        Odin: 2
+        Thor: 2
+        Loki: 2
+      skill_changes:
+        perception: 2
+        healing: 2
+        speed: 2
+    highway_robber:
+      text: "Stealing from travelers. You've always been at the fringes of society, and had a certain disdain for other men. As a highway robber you've taken these traits to their extreme."
+      alignment_changes:
+        Odin: 2
+        Loki: 2
+        Thor: 2
+      skill_changes:
+        perception: 2
+        intimidation: 2
+        deception: 2

@@ -1,0 +1,40 @@
+---
+name: tailless_humanoid
+body_plan:
+  organic_head:
+    organic_neck:
+      organic_upper_torso:
+        - organic_upper_arm:
+            organic_lower_arm:
+              organic_hand
+        - organic_upper_arm:
+            organic_lower_arm:
+              organic_hand
+        - organic_lower_torso:
+            - organic_upper_leg:
+                organic_lower_leg:
+                  organic_foot
+            - organic_upper_leg:
+                organic_lower_leg:
+                  organic_foot
+---
+name: tailed_humanoid
+body_plan:
+  organic_head:
+    organic_neck:
+      organic_upper_torso:
+        - organic_upper_arm:
+            organic_lower_arm:
+              organic_hand
+        - organic_upper_arm:
+            organic_lower_arm:
+              organic_hand
+        - organic_lower_torso:
+            - organic_upper_leg:
+                organic_lower_leg:
+                  organic_foot
+            - organic_upper_leg:
+                organic_lower_leg:
+                  organic_foot
+            - organic_tail
+---
