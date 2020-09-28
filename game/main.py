@@ -1,26 +1,26 @@
-from lib import *
+from game.lib.lib import *
 from random import choice, randint
 import pandas as pd
 
 
 def initialize_game():
     game = Game()
-    materials = Material.from_yaml('./data/materials.yaml')
+    materials = Material.from_yaml('data/materials.yaml')
     for material in materials:
         game_object = game.register_object(material)
         game_object.build(game)
 
-    organs = Organ.from_yaml('./data/organs.yaml')
+    organs = Organ.from_yaml('data/organs.yaml')
     for organ in organs:
         game_object = game.register_object(organ)
         game_object.build(game)
 
-    body_parts = BodyPart.from_yaml('./data/body_parts.yaml')
+    body_parts = BodyPart.from_yaml('data/body_parts.yaml')
     for bp in body_parts:
         game_object = game.register_object(bp)
         game_object.build(game)
 
-    body_plans = BodyPlan.from_yaml('./data/body_plans.yaml')
+    body_plans = BodyPlan.from_yaml('data/body_plans.yaml')
     for bp in body_plans:
         game_object = game.register_object(bp)
         game_object.build(game)
@@ -29,7 +29,7 @@ def initialize_game():
 
 
 def initialize_player_characters(num, game):
-    with open('./data/backstory.yaml') as file:
+    with open('data/backstory.yaml') as file:
         backstory = yaml.safe_load(file)
     for c in range(num):
         character = Character(name='Test', soul=Soul(), body=Body('Human', game.get_object('BodyPlan_tailless_humanoid')))
@@ -55,7 +55,7 @@ def test_backstory_balance():
     character = Character(name='Test', soul=Soul(), body=Body('Human', game.get_object('BodyPlan_tailless_humanoid')))
     skills = pd.DataFrame(character.soul.skills, index=[0])
     alignments = pd.DataFrame(character.soul.deity_favor, index=[0])
-    with open('./data/backstory.yaml') as file:
+    with open('data/backstory.yaml') as file:
         backstory = yaml.safe_load(file)
     for i in range(10000):
 
