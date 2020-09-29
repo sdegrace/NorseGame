@@ -5,10 +5,8 @@ import pandas as pd
 
 def initialize_game():
     game = Game()
-    materials = Material.from_yaml('data/materials.yaml')
-    for material in materials:
-        game_object = game.register_object(material)
-        game_object.build(game)
+
+    game = initialize_materials(game)
 
     organs = Organ.from_yaml('data/organs.yaml')
     for organ in organs:
@@ -25,6 +23,14 @@ def initialize_game():
         game_object = game.register_object(bp)
         game_object.build(game)
 
+    return game
+
+
+def initialize_materials(game=None):
+    materials = Material.from_yaml('data/materials.yaml')
+    for material in materials:
+        game_object = game.register_object(material)
+        game_object.build(game)
     return game
 
 

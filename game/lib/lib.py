@@ -20,7 +20,7 @@ class Character(GameObject):
         self.soul = soul
         self.body = body
         self.name = name
-        self.backstory=backstory
+        self.backstory = backstory
 
     def gain_skill(self, skill, points):
         self.soul.skills[skill] += points * self.soul.get_governing_deity_favor(skill)
@@ -31,7 +31,6 @@ class Character(GameObject):
 
 class Soul(GameObject):
 
-
     def __init__(self, odin_favor=0, thor_favor=0, loki_favor=0,
                  tactics=0, lore=0, perception=0, investigation=0, deduction=0,
                  power=0, athletics=0, healing=0, intimidation=0, performance=0,
@@ -40,9 +39,12 @@ class Soul(GameObject):
         self.deity_favor = {'odin': odin_favor,
                             'thor': thor_favor,
                             'loki': loki_favor}
-        self.skills = {'tactics': tactics, 'lore': lore, 'perception': perception, 'investigation': investigation, 'deduction': deduction,
-                       'power': power, 'athletics': athletics, 'healing': healing, 'intimidation': intimidation, 'performance': performance,
-                       'accuracy': accuracy, 'speed': speed, 'persuasion': persuasion, 'deception': deception, 'stealth': stealth}
+        self.skills = {'tactics': tactics, 'lore': lore, 'perception': perception, 'investigation': investigation,
+                       'deduction': deduction,
+                       'power': power, 'athletics': athletics, 'healing': healing, 'intimidation': intimidation,
+                       'performance': performance,
+                       'accuracy': accuracy, 'speed': speed, 'persuasion': persuasion, 'deception': deception,
+                       'stealth': stealth}
 
     def get_governing_deity(self, skill):
         governing_deities = {'tactics': 'odin', 'lore': 'odin', 'perception': 'odin', 'investigation': 'odin',
@@ -151,9 +153,9 @@ class BodyPlan(GameObject):
     @staticmethod
     def _build(body_plan, game):
         if type(body_plan) == dict:
-            return {game.get_object('BodyPart_'+key): BodyPlan._build(val, game) for key, val in body_plan.items()}
+            return {game.get_object('BodyPart_' + key): BodyPlan._build(val, game) for key, val in body_plan.items()}
         elif type(body_plan) == str:
-            return game.get_object('BodyPart_'+body_plan)
+            return game.get_object('BodyPart_' + body_plan)
         elif type(body_plan) == list:
             return [BodyPlan._build(item, game) for item in body_plan]
         else:
@@ -176,8 +178,9 @@ class Body(GameObject):
         return bodies
 
     def build(self, game):
-        self.body_plan = game.get_object('BodyPlan_'+self.body_plan)
+        self.body_plan = game.get_object('BodyPlan_' + self.body_plan)
         super(Body, self).build(game)
+
 
 class BodyPart(GameObject):
 
@@ -201,7 +204,7 @@ class BodyPart(GameObject):
         super(BodyPart, self).build(game)
         for layer in self.layers:
             mat_name = layer['material']
-            mat_ref = game.get_object('Material_'+mat_name)
+            mat_ref = game.get_object('Material_' + mat_name)
             layer['material'] = mat_ref
 
 
@@ -231,10 +234,12 @@ class Organ(GameObject):
 
 class Material(GameObject):
 
-    def __init__(self, name, density, compressive_yield, compressive_ult, tensile_yield, tensile_ult, shear_yield,
-                 shear_ult, mod_of_elasticity, shear_modulus, strain_at_fracture):
+    def __init__(self, name, density, compressive_yield, compressive_ult, tensile_yield=None, tensile_ult=None,
+                 shear_yield=None, shear_ult=None, mod_of_elasticity=None, shear_modulus=None, strain_at_fracture=None,
+                 color=None):
         super().__init__(_registry_lookup='Material_' + name)
         self.name = name
+        self.color = color
         self.density = density
         self.compressive_yield = compressive_yield
         self.compressive_ult = compressive_ult
@@ -254,18 +259,19 @@ class Material(GameObject):
             for mat in loaded_yamls:
                 if mat is not None:
                     materials.append(Material(
-                        mat['name'], mat['density'], mat['compressive_yield'], mat['compressive_ult'], mat['tensile_yield'],
+                        mat['name'], mat['density'], mat['compressive_yield'], mat['compressive_ult'],
+                        mat['tensile_yield'],
                         mat['tensile_ult'],
                         mat['tensile_yield'] * .577 if 'shear_yield' not in mat.keys() else mat['shear_yield'],
                         mat['tensile_ult'] * .577 if 'shear_ult' not in mat.keys() else mat['shear_ult'],
-                        mat['mod_of_elasticity'], mat['shear_modulus'], mat['strain_at_fracture']
+                        mat['mod_of_elasticity'], mat['shear_modulus'], mat['strain_at_fracture'], mat['color']
                     ))
         return materials
 
 
 class Game:
 
-    def __init__(self, object_registry: pd.DataFrame=None):
+    def __init__(self, object_registry: pd.DataFrame = None):
         if object_registry is None:
             self.object_registry = pd.DataFrame(columns=['GameObject'])
         else:
