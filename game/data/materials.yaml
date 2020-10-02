@@ -8,7 +8,7 @@ compressive_ult: 10000
 mod_of_elasticity: 202000
 shear_modulus: 79500
 strain_at_fracture: .202
-color: 69665e
+color: "#69665e"
 ---
 name: med_carbon_steel
 density: 7.85
@@ -19,7 +19,7 @@ compressive_ult: 10000
 mod_of_elasticity: 203000
 shear_modulus: 79600
 strain_at_fracture: .189
-color: 858177
+color: "#858177"
 ---
 name: high_carbon_steel
 density: 7.5
@@ -30,7 +30,7 @@ compressive_ult: 10000
 mod_of_elasticity: 198000
 shear_modulus: 79900
 strain_at_fracture: .146
-color: 9e998d
+color: "#9e998d"
 ---
 name: fleshy
 density: .985
@@ -41,7 +41,7 @@ compressive_ult: .1
 mod_of_elasticity: .266
 shear_modulus: .3
 strain_at_fracture: .85
-color: bd0823
+color: "#bd0823"
 ---
 name: bone
 density: 3.3
@@ -52,26 +52,26 @@ compressive_ult: 175
 mod_of_elasticity: 17600
 shear_modulus: 4000
 strain_at_fracture: .03
-color: f0e1e3
+color: "#f0e1e3"
 ---
 name: oak
 density: 3.3
-tensile_ult: 130
-tensile_yield: 122
-compressive_yield: 170
-compressive_ult: 175
-mod_of_elasticity: 17600
+tensile_ult: 5.2
+tensile_yield: 5.1
+compressive_yield: 12
+compressive_ult: 13
+mod_of_elasticity: 12500
 shear_modulus: 4000
 strain_at_fracture: .03
-color: 332011
+color: "#332011"
 ---
 name: dirt
-density: 3.3
-tensile_ult: 130
-tensile_yield: 122
-compressive_yield: 170
-compressive_ult: 175
-mod_of_elasticity: 17600
-shear_modulus: 4000
-strain_at_fracture: .03
-color: 1c1108
+density: 1.5
+tensile_ult: 1
+tensile_yield: 1
+compressive_yield: .2
+compressive_ult: .3
+mod_of_elasticity: 1
+shear_modulus: 1
+strain_at_fracture: 0
+color: "#1c1108"

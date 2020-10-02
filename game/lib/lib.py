@@ -1,5 +1,7 @@
 import yaml
 import pandas as pd
+import numpy as np
+from PIL import Image
 
 
 class GameObject:
@@ -268,6 +270,36 @@ class Material(GameObject):
                     ))
         return materials
 
+
+class Scene:
+
+    def __init__(self, name, size=(1000, 1000), layout=None, material_mapping=None):
+        if layout is None:
+            self.layout = np.zeros(size)
+            self.size = size
+        else:
+            self.layout = layout
+            self.size = layout.shape
+        if material_mapping is None:
+            self.material_mapping = {}
+        else:
+            self.material_mapping = material_mapping
+
+    def from_yaml(self, filename):
+        with open(filename) as file:
+            loaded_yamls = yaml.safe_load_all(file)
+        scenes = []
+        for scene in loaded_yamls:
+            if scene is not None:
+                layout_file = scene['filename']
+                im = Image.open(layout_file)
+                im = np.array(im)
+                assert im.shape[1] == scene['length']
+                assert im.shape[0] == scene['width']
+
+                scenes.append(Scene(name=scene['name'], layout=im, material_mapping=scene['material_mapping']))
+
+        return scenes
 
 class Game:
 
