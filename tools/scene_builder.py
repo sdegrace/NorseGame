@@ -11,6 +11,10 @@ from game.lib.lib import Material, Scene
 def do_nothing():
     pass
 
+def contrasting_text_color(hex_str):
+    (r, g, b) = (hex_str[:2], hex_str[2:4], hex_str[4:])
+    return '#000000' if 1 - (int(r, 16) * 0.299 + int(g, 16) * 0.587 + int(b, 16) * 0.114) / 255 < 0.5 else '#ffffff'
+
 
 class Example(tk.Frame):
     ICON_PADDING = 4
@@ -21,7 +25,10 @@ class Example(tk.Frame):
         self.scene_view = None
         self.current_scene = None
         self.has_changes = False
-        self.materials = {mat.name: (tk.IntVar(), mat, None) for mat in Material.from_yaml('../game/data/materials.yaml')}
+        self.materials = {mat.name: (tk.IntVar(), mat, None) for mat in
+                          Material.from_yaml('../game/data/materials.yaml')}
+        self.current_material = None
+        self.current_object = None
         for var, mat, button in self.materials.values():
             var.set(1)
         self.object_icons = []
@@ -37,17 +44,24 @@ class Example(tk.Frame):
         # self.build_right_bar()
 
         self.bottom_frame = tk.Frame(master=self)
-        self.bottom_frame.grid(row=4, column=0, columnspan=6, sticky=tk.E + tk.W + tk.S + tk.N)
+        self.bottom_frame.grid(row=1, column=0, columnspan=3, sticky=tk.E + tk.W + tk.S + tk.N)
         # tk.Label(master=self.bottom_frame, text='TEST', bg='red').pack(fill=tk.BOTH, expand=True)
 
-        self.columnconfigure(2, weight=1)
+        self.columnconfigure(1, weight=1)
+        self.rowconfigure(0, weight=1)
         # self.columnconfigure(3, pad=7)
         # self.columnconfigure(4, pad=7)
-        self.rowconfigure(3, weight=1)
-        self.rowconfigure(5, pad=7)
+        # self.rowconfigure(3, weight=1)
+        # self.rowconfigure(5, pad=7)
+
+        self.left_notebook = ttk.Notebook(self)
+        self.left_notebook.grid(row=0, column=0, sticky=tk.E + tk.W + tk.S + tk.N)
+
+        self.right_notebook = ttk.Notebook(self)
+        self.right_notebook.grid(row=0, column=2, sticky=tk.E + tk.W + tk.S + tk.N)
 
         self.scene_view_frame = tk.Frame(master=self)
-        self.scene_view_frame.grid(row=0, column=2, columnspan=2, rowspan=4, padx=5, sticky=tk.E + tk.W + tk.S + tk.N)
+        self.scene_view_frame.grid(row=0, column=1, padx=5, sticky=tk.E + tk.W + tk.S + tk.N)
 
         self.build_canvas()
 
@@ -61,8 +75,8 @@ class Example(tk.Frame):
         self.scene_view.configure(scrollregion=(0, 0, max_x, max_y))
         self.scene_view.grid(row=0, column=0, sticky=tk.E + tk.W + tk.S + tk.N)
 
-        self.scene_view.bind("<ButtonPress-1>", self.scroll_start)
-        self.scene_view.bind("<B1-Motion>", self.scroll_move)
+        self.scene_view.bind("<ButtonPress-2>", self.scroll_start)
+        self.scene_view.bind("<B2-Motion>", self.scroll_move)
 
         self.xsb.grid(row=1, column=0, sticky="ew")
         self.ysb.grid(row=0, column=1, sticky="ns")
@@ -75,21 +89,11 @@ class Example(tk.Frame):
     def scroll_move(self, event):
         self.scene_view.scan_dragto(event.x, event.y, gain=1)
 
-    def build_left_bar(self):
-        self.left_notebook = ttk.Notebook(self)
-        self.left_mat_tab = tk.Frame(self.left_notebook)
-        self.left_obj_tab = tk.Frame(self.left_notebook)
-        self.left_notebook.add(self.left_mat_tab, text='Materials')
-        self.left_notebook.add(self.left_obj_tab, text='Objects')
-        self.left_notebook.grid(row=0, column=1, rowspan=4, sticky=tk.E + tk.W + tk.S + tk.N)
+    def material_button_generator(self, material):
+        def func():
+            self.current_material = material
+        return func
 
-        # self.label1 = ttk.Label(self.mat_tab, text='Materials').grid(row=1, column=1)
-        # self.label2 = ttk.Label(self.obj_tab, text='Objects').grid(row=1, column=1)
-
-        for name, (var, mat, button) in self.materials.items():
-            if var.get():
-                check=tk.Checkbutton(master=self.left_mat_tab, text=name, variable=var)
-                check.pack(side=tk.TOP)
 
     def new(self):
         # filetypes = [('all files', '.*'), ('yamls', '.yaml')]
@@ -97,44 +101,85 @@ class Example(tk.Frame):
         #                                         initialdir='../game/data/',
         #                                         title="Please select a file to save the scene:")
         if self.current_scene is not None and self.has_changes:
-            response = messagebox.askyesno('Discard Chages?',
+            response = messagebox.askyesno('Discard Changes?',
                                            '''If you create a new scene now, your existing changes will be discarded. 
                                            Do you really want to discard these changes?''')
             if not response:
                 return
-
 
         name = simpledialog.askstring('Name', 'What is the name of the new scene?', parent=self)
         length = simpledialog.askfloat('Length', 'How long will the scene be, in meters?', parent=self)
         width = simpledialog.askfloat('Width', 'How wide will the scene be, in meters?', parent=self)
         length *= 10
         width *= 10
-        self.build_canvas(length*10+5, width*10+5)
+        self.build_canvas(length * 10 + 5, width * 10 + 5)
         self.current_scene = Scene(name, (ceil(length), ceil(width)))
         img = ImageTk.PhotoImage(image=Image.fromarray(self.current_scene.layout))
         self.scene_view.create_image((0, 0), anchor='nw', image=img)
-        self.scene_view.create_rectangle(0,0,length*10, width*10)
+        self.scene_view.create_rectangle(0, 0, length * 10, width * 10)
         self.build_right_bar()
         self.build_left_bar()
-
+        self.build_bottom_bar()
 
     def build_right_materials(self):
         for i, (name, (activated, material, button)), in enumerate(self.materials.items()):
             if button is None:
-                button = tk.Button(master=self.right_mat_tab, text=name, fg=material.color)
+                button = tk.Button(master=self.right_mat_tab, text=name, bg=material.color, fg=contrasting_text_color(material.color[1:]), command=self.material_button_generator(material))
             if activated:
-                button.grid(column=i%3, row=i//3, pady=self.ICON_PADDING, padx=self.ICON_PADDING)
+                button.grid(column=i % 3, row=i // 3, pady=self.ICON_PADDING, padx=self.ICON_PADDING)
             else:
                 button.grid_forget()
 
+    def build_bottom_bar(self):
+        self.shape_frame = tk.Frame(self.bottom_frame)
+        self.shape_frame.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+        self.coord_frame = tk.Frame(self.bottom_frame)
+        self.coord_frame.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+        self.fill_frame = tk.Frame(self.bottom_frame)
+        self.fill_frame.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+        self.snap_frame = tk.Frame(self.bottom_frame)
+        self.snap_frame.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+
+        line_button = tk.Button(self.shape_frame, text='Line')
+        line_button.grid(row=0, column=0)
+
+        rectangle_button = tk.Button(self.shape_frame, text='Rectangle')
+        rectangle_button.grid(row=1, column=0)
+
+        circle_button = tk.Button(self.shape_frame, text='Circle')
+        circle_button.grid(row=0, column=1)
+
+        ellipse_button = tk.Button(self.shape_frame, text='Ellipse')
+        ellipse_button.grid(row=1, column=1)
+
+        arc_button = tk.Button(self.shape_frame, text='Arc')
+        arc_button.grid(row=0, column=2)
+
+        freehand_button = tk.Button(self.shape_frame, text='Freehand')
+        freehand_button.grid(row=1, column=2)
+
+
+
+    def build_left_bar(self):
+        self.left_mat_tab = tk.Frame(self.left_notebook)
+        self.left_obj_tab = tk.Frame(self.left_notebook)
+        self.left_notebook.add(self.left_mat_tab, text='Materials')
+        self.left_notebook.add(self.left_obj_tab, text='Objects')
+
+        # self.label1 = ttk.Label(self.mat_tab, text='Materials').grid(row=1, column=1)
+        # self.label2 = ttk.Label(self.obj_tab, text='Objects').grid(row=1, column=1)
+
+        for name, (var, mat, button) in self.materials.items():
+            if var.get():
+                check = tk.Checkbutton(master=self.left_mat_tab, text=name, variable=var)
+                check.pack(side=tk.TOP)
 
     def build_right_bar(self):
-        self.right_notebook = ttk.Notebook(self)
         self.right_mat_tab = tk.Frame(self.right_notebook)
         self.right_obj_tab = tk.Frame(self.right_notebook)
         self.right_notebook.add(self.right_mat_tab, text='Materials')
         self.right_notebook.add(self.right_obj_tab, text='Objects')
-        self.right_notebook.grid(row=0, column=4, rowspan=4, sticky=tk.E + tk.W + tk.S + tk.N)
+
         self.build_right_materials()
         # self.icon = tk.PhotoImage(file='../game/data/images/3dots.gif', width="50", height="50")
         # button = tk.Button(self, image=self.icon)
@@ -146,7 +191,8 @@ class Example(tk.Frame):
             img = Image.open(icon)
             img = img.resize((50, 50), Image.ANTIALIAS)
             self.object_icons.append(ImageTk.PhotoImage(img))
-            self.button = tk.Button(self.right_obj_tab, image=self.object_icons[-1], text=icon.split('/')[-1], compound='top')
+            self.button = tk.Button(self.right_obj_tab, image=self.object_icons[-1], text=icon.split('/')[-1],
+                                    compound='top')
             # self.buttons.append(button)
             self.button.grid(row=row, column=col, pady=self.ICON_PADDING, padx=self.ICON_PADDING)
 
