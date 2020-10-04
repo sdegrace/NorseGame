@@ -18,6 +18,7 @@ class Example(tk.Frame):
     def __init__(self, root):
         super().__init__()
         self.root = root
+        self.scene_view = None
         self.current_scene = None
         self.has_changes = False
         self.materials = {mat.name: (tk.IntVar(), mat, None) for mat in Material.from_yaml('../game/data/materials.yaml')}
@@ -45,14 +46,34 @@ class Example(tk.Frame):
         self.rowconfigure(3, weight=1)
         self.rowconfigure(5, pad=7)
 
-        self.scene_view = tk.Canvas(self, bg="white")
-        self.scene_view.grid(row=0, column=2, columnspan=2, rowspan=4, padx=5, sticky=tk.E + tk.W + tk.S + tk.N)
+        self.scene_view_frame = tk.Frame(master=self)
+        self.scene_view_frame.grid(row=0, column=2, columnspan=2, rowspan=4, padx=5, sticky=tk.E + tk.W + tk.S + tk.N)
 
-        # hbtn = tk.Button(self, text="Help")
-        # hbtn.grid(row=5, column=0, padx=5)
-        #
-        # obtn = tk.Button(self, text="OK")
-        # obtn.grid(row=5, column=3)
+        self.build_canvas()
+
+    def build_canvas(self, max_x=100, max_y=100):
+        if self.scene_view is not None:
+            self.scene_view.destroy()
+        self.scene_view = tk.Canvas(self.scene_view_frame, bg="white", width=max_x, height=max_y)
+        self.xsb = tk.Scrollbar(self.scene_view_frame, orient="horizontal", command=self.scene_view.xview)
+        self.ysb = tk.Scrollbar(self.scene_view_frame, orient="vertical", command=self.scene_view.yview)
+        self.scene_view.configure(yscrollcommand=self.ysb.set, xscrollcommand=self.xsb.set)
+        self.scene_view.configure(scrollregion=(0, 0, max_x, max_y))
+        self.scene_view.grid(row=0, column=0, sticky=tk.E + tk.W + tk.S + tk.N)
+
+        self.scene_view.bind("<ButtonPress-1>", self.scroll_start)
+        self.scene_view.bind("<B1-Motion>", self.scroll_move)
+
+        self.xsb.grid(row=1, column=0, sticky="ew")
+        self.ysb.grid(row=0, column=1, sticky="ns")
+        self.scene_view_frame.grid_rowconfigure(0, weight=1)
+        self.scene_view_frame.grid_columnconfigure(0, weight=1)
+
+    def scroll_start(self, event):
+        self.scene_view.scan_mark(event.x, event.y)
+
+    def scroll_move(self, event):
+        self.scene_view.scan_dragto(event.x, event.y, gain=1)
 
     def build_left_bar(self):
         self.left_notebook = ttk.Notebook(self)
@@ -82,12 +103,17 @@ class Example(tk.Frame):
             if not response:
                 return
 
+
         name = simpledialog.askstring('Name', 'What is the name of the new scene?', parent=self)
         length = simpledialog.askfloat('Length', 'How long will the scene be, in meters?', parent=self)
         width = simpledialog.askfloat('Width', 'How wide will the scene be, in meters?', parent=self)
         length *= 10
         width *= 10
+        self.build_canvas(length*10+5, width*10+5)
         self.current_scene = Scene(name, (ceil(length), ceil(width)))
+        img = ImageTk.PhotoImage(image=Image.fromarray(self.current_scene.layout))
+        self.scene_view.create_image((0, 0), anchor='nw', image=img)
+        self.scene_view.create_rectangle(0,0,length*10, width*10)
         self.build_right_bar()
         self.build_left_bar()
 
