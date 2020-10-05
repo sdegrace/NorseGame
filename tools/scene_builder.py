@@ -11,8 +11,10 @@ from game.lib.lib import Material, Scene
 def do_nothing():
     pass
 
+
 def contrasting_text_color(hex_str):
     (r, g, b) = (hex_str[:2], hex_str[2:4], hex_str[4:])
+    print(hex_str)
     return '#000000' if 1 - (int(r, 16) * 0.299 + int(g, 16) * 0.587 + int(b, 16) * 0.114) / 255 < 0.5 else '#ffffff'
 
 
@@ -21,10 +23,19 @@ class Example(tk.Frame):
 
     def __init__(self, root):
         super().__init__()
+        default_button = tk.Button()
+        self.fg_default = default_button.cget('foreground')
+        self.bg_default = default_button.cget('background')
+        self.active_shape_fg = None
+        self.active_shape_bg = None
+        self.active_shape_fg = self.fg_default
+        self.active_shape_bg = self.bg_default
+        self.active_shape_button = None
         self.root = root
         self.scene_view = None
         self.current_scene = None
         self.has_changes = False
+        self.current_draw_shape = None
         self.materials = {mat.name: (tk.IntVar(), mat, None) for mat in
                           Material.from_yaml('../game/data/materials.yaml')}
         self.current_material = None
@@ -34,6 +45,7 @@ class Example(tk.Frame):
         self.object_icons = []
         self.object_buttons = []
         self.material_buttons = []
+        self.shape_buttons = []
         self.initUI()
 
     def initUI(self):
@@ -89,12 +101,6 @@ class Example(tk.Frame):
     def scroll_move(self, event):
         self.scene_view.scan_dragto(event.x, event.y, gain=1)
 
-    def material_button_generator(self, material):
-        def func():
-            self.current_material = material
-        return func
-
-
     def new(self):
         # filetypes = [('all files', '.*'), ('yamls', '.yaml')]
         # savepath = filedialog.asksaveasfilename(parent=self,
@@ -124,11 +130,35 @@ class Example(tk.Frame):
     def build_right_materials(self):
         for i, (name, (activated, material, button)), in enumerate(self.materials.items()):
             if button is None:
-                button = tk.Button(master=self.right_mat_tab, text=name, bg=material.color, fg=contrasting_text_color(material.color[1:]), command=self.material_button_generator(material))
+                button = tk.Button(master=self.right_mat_tab, text=name, bg=material.color,
+                                   fg=contrasting_text_color(material.color[1:]),
+                                   command=self.material_button_generator(material))
             if activated:
                 button.grid(column=i % 3, row=i // 3, pady=self.ICON_PADDING, padx=self.ICON_PADDING)
             else:
                 button.grid_forget()
+
+    def shape_func_generator(self, shape, button):
+        def func():
+            for b in self.shape_buttons:
+                b.config(fg=self.fg_default, bg=self.bg_default)
+            button.config(fg=self.active_shape_fg, bg=self.active_shape_bg)
+            self.current_draw_shape = shape
+            self.active_shape_button = button
+
+        return func
+
+    def material_button_generator(self, material):
+        def func():
+            self.current_material = material
+            fg = material.color
+            bg = contrasting_text_color(material.color[1:])
+            self.active_shape_fg = fg
+            self.active_shape_bg = bg
+            if self.active_shape_button is not None:
+                self.active_shape_button.config(fg=fg, bg=bg)
+
+        return func
 
     def build_bottom_bar(self):
         self.shape_frame = tk.Frame(self.bottom_frame)
@@ -141,24 +171,30 @@ class Example(tk.Frame):
         self.snap_frame.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
 
         line_button = tk.Button(self.shape_frame, text='Line')
+        line_button.config(command=self.shape_func_generator('line', line_button))
         line_button.grid(row=0, column=0)
 
         rectangle_button = tk.Button(self.shape_frame, text='Rectangle')
+        rectangle_button.config(command=self.shape_func_generator('rectangle', rectangle_button))
         rectangle_button.grid(row=1, column=0)
 
         circle_button = tk.Button(self.shape_frame, text='Circle')
+        circle_button.config(command=self.shape_func_generator('circle', circle_button))
         circle_button.grid(row=0, column=1)
 
         ellipse_button = tk.Button(self.shape_frame, text='Ellipse')
+        ellipse_button.config(command=self.shape_func_generator('ellipse', ellipse_button))
         ellipse_button.grid(row=1, column=1)
 
         arc_button = tk.Button(self.shape_frame, text='Arc')
+        arc_button.config(command=self.shape_func_generator('arc', arc_button))
         arc_button.grid(row=0, column=2)
 
         freehand_button = tk.Button(self.shape_frame, text='Freehand')
+        freehand_button.config(command=self.shape_func_generator('freehand', freehand_button))
         freehand_button.grid(row=1, column=2)
 
-
+        self.shape_buttons = [line_button, rectangle_button, circle_button, ellipse_button, arc_button, freehand_button]
 
     def build_left_bar(self):
         self.left_mat_tab = tk.Frame(self.left_notebook)
@@ -191,10 +227,10 @@ class Example(tk.Frame):
             img = Image.open(icon)
             img = img.resize((50, 50), Image.ANTIALIAS)
             self.object_icons.append(ImageTk.PhotoImage(img))
-            self.button = tk.Button(self.right_obj_tab, image=self.object_icons[-1], text=icon.split('/')[-1],
-                                    compound='top')
+            button = tk.Button(self.right_obj_tab, image=self.object_icons[-1], text=icon.split('/')[-1],
+                               compound='top')
             # self.buttons.append(button)
-            self.button.grid(row=row, column=col, pady=self.ICON_PADDING, padx=self.ICON_PADDING)
+            button.grid(row=row, column=col, pady=self.ICON_PADDING, padx=self.ICON_PADDING)
 
     def build_menu(self):
         self.menubar = tk.Menu(self)
