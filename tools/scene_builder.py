@@ -2,11 +2,13 @@ import tkinter as tk
 from tkinter import filedialog, simpledialog, messagebox
 from tkinter import ttk
 import glob
-from math import ceil
+from math import ceil, floor
 from PIL import ImageTk, Image
 
 from game.lib.lib import Material, Scene
 
+def rounddown(x):
+    return int(floor(x / 10.0)) * 10
 
 def do_nothing():
     pass
@@ -30,9 +32,11 @@ class Example(tk.Frame):
         self.active_shape_bg = None
         self.active_shape_fg = self.fg_default
         self.active_shape_bg = self.bg_default
+        self.current_bound_paint = do_nothing
         self.active_shape_button = None
         self.root = root
         self.scene_view = None
+        self.current_paint_stroke = 0
         self.current_scene = None
         self.has_changes = False
         self.current_draw_shape = None
@@ -61,10 +65,6 @@ class Example(tk.Frame):
 
         self.columnconfigure(1, weight=1)
         self.rowconfigure(0, weight=1)
-        # self.columnconfigure(3, pad=7)
-        # self.columnconfigure(4, pad=7)
-        # self.rowconfigure(3, weight=1)
-        # self.rowconfigure(5, pad=7)
 
         self.left_notebook = ttk.Notebook(self)
         self.left_notebook.grid(row=0, column=0, sticky=tk.E + tk.W + tk.S + tk.N)
@@ -138,27 +138,45 @@ class Example(tk.Frame):
             else:
                 button.grid_forget()
 
-    def shape_func_generator(self, shape, button):
+    def shape_func_generator(self, paint_functions, button):
         def func():
             for b in self.shape_buttons:
                 b.config(fg=self.fg_default, bg=self.bg_default)
             button.config(fg=self.active_shape_fg, bg=self.active_shape_bg)
-            self.current_draw_shape = shape
+            self.scene_view.bind("<Button-1>", paint_functions[0])
+            self.scene_view.bind("<B1-Motion>", paint_functions[1])
+            self.scene_view.bind("<ButtonRelease-1>", paint_functions[2])
             self.active_shape_button = button
+
 
         return func
 
     def material_button_generator(self, material):
         def func():
             self.current_material = material
-            fg = material.color
-            bg = contrasting_text_color(material.color[1:])
+            bg = material.color
+            fg = contrasting_text_color(material.color[1:])
             self.active_shape_fg = fg
             self.active_shape_bg = bg
             if self.active_shape_button is not None:
                 self.active_shape_button.config(fg=fg, bg=bg)
 
         return func
+
+    def paint_freehand_move(self, event):
+        print(self.current_paint_stroke)
+        x1, y1 = (rounddown(event.x)), (rounddown(event.y))
+        x2, y2 = (rounddown(event.x) + 10), (rounddown(event.y) + 10)
+        self.scene_view.create_rectangle(x1, y1, x2, y2, fill=self.current_material.color, tags=())
+    def paint_freehand_start(self, event):
+        x1, y1 = (rounddown(event.x)), (rounddown(event.y))
+        x2, y2 = (rounddown(event.x) + 10), (rounddown(event.y) + 10)
+        self.scene_view.create_rectangle(x1, y1, x2, y2, fill=self.current_material.color, tags=())
+    def paint_freehand_end(self, event):
+        self.current_paint_stroke += 1
+        x1, y1 = (rounddown(event.x)), (rounddown(event.y))
+        x2, y2 = (rounddown(event.x) + 10), (rounddown(event.y) + 10)
+        self.scene_view.create_rectangle(x1, y1, x2, y2, fill=self.current_material.color, tags=())
 
     def build_bottom_bar(self):
         self.shape_frame = tk.Frame(self.bottom_frame)
@@ -191,7 +209,9 @@ class Example(tk.Frame):
         arc_button.grid(row=0, column=2)
 
         freehand_button = tk.Button(self.shape_frame, text='Freehand')
-        freehand_button.config(command=self.shape_func_generator('freehand', freehand_button))
+        freehand_button.config(command=self.shape_func_generator([self.paint_freehand_start,
+                                                                  self.paint_freehand_move,
+                                                                  self.paint_freehand_end], freehand_button))
         freehand_button.grid(row=1, column=2)
 
         self.shape_buttons = [line_button, rectangle_button, circle_button, ellipse_button, arc_button, freehand_button]
