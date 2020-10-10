@@ -2,8 +2,10 @@ import tkinter as tk
 from tkinter import filedialog, simpledialog, messagebox
 from tkinter import ttk
 import glob
-from math import ceil, floor
+from math import ceil, floor, sqrt
+from functools import partial
 from PIL import ImageTk, Image
+from tools.image_processing_tools import *
 
 from game.lib.lib import Material, Scene
 
@@ -14,17 +16,12 @@ def do_nothing():
     pass
 
 
-def contrasting_text_color(hex_str):
-    (r, g, b) = (hex_str[:2], hex_str[2:4], hex_str[4:])
-    print(hex_str)
-    return '#000000' if 1 - (int(r, 16) * 0.299 + int(g, 16) * 0.587 + int(b, 16) * 0.114) / 255 < 0.5 else '#ffffff'
-
-
 class Example(tk.Frame):
     ICON_PADDING = 4
 
-    def __init__(self, root):
+    def __init__(self, root, scaling_factor=10):
         super().__init__()
+        self.scaling_factor = scaling_factor
         default_button = tk.Button()
         self.fg_default = default_button.cget('foreground')
         self.bg_default = default_button.cget('background')
@@ -32,6 +29,7 @@ class Example(tk.Frame):
         self.active_shape_bg = None
         self.active_shape_fg = self.fg_default
         self.active_shape_bg = self.bg_default
+        self.current_2pt_1st_pt = None
         self.current_bound_paint = do_nothing
         self.active_shape_button = None
         self.root = root
@@ -51,6 +49,10 @@ class Example(tk.Frame):
         self.material_buttons = []
         self.shape_buttons = []
         self.initUI()
+        self.shape_mapping = {'circle': circle,
+                              'line': line,
+                              'rectangle': rectangle,
+                              'arc': arc}
 
     def initUI(self):
         self.master.title("Scene Builder")
@@ -163,20 +165,45 @@ class Example(tk.Frame):
 
         return func
 
+    def draw_point(self, x, y, tags):
+        self.scene_view.create_rectangle(x*10, y*10, (x+1)*10, (y+1)*10, fill=self.current_material.color, tags=tags)
+
     def paint_freehand_move(self, event):
         print(self.current_paint_stroke)
-        x1, y1 = (rounddown(event.x)), (rounddown(event.y))
-        x2, y2 = (rounddown(event.x) + 10), (rounddown(event.y) + 10)
-        self.scene_view.create_rectangle(x1, y1, x2, y2, fill=self.current_material.color, tags=())
+        x, y = event.x//10, event.y//10
+        self.draw_point(x, y, ('stroke_'+str(self.current_paint_stroke), 'freehand'))
+
     def paint_freehand_start(self, event):
-        x1, y1 = (rounddown(event.x)), (rounddown(event.y))
-        x2, y2 = (rounddown(event.x) + 10), (rounddown(event.y) + 10)
-        self.scene_view.create_rectangle(x1, y1, x2, y2, fill=self.current_material.color, tags=())
+        x, y = event.x//10, event.y//10
+        self.draw_point(x, y, ('stroke_' + str(self.current_paint_stroke), 'freehand'))
+
     def paint_freehand_end(self, event):
         self.current_paint_stroke += 1
-        x1, y1 = (rounddown(event.x)), (rounddown(event.y))
-        x2, y2 = (rounddown(event.x) + 10), (rounddown(event.y) + 10)
-        self.scene_view.create_rectangle(x1, y1, x2, y2, fill=self.current_material.color, tags=())
+        x, y = event.x//10, event.y//10
+        self.draw_point(x, y, ('stroke_' + str(self.current_paint_stroke), 'freehand'))
+
+
+    def paint_2pt_shape_start(self, event, shape):
+        print(event, shape)
+        print(self.current_paint_stroke)
+        self.current_2pt_1st_pt = (event.x//10, event.y//10)
+
+    def paint_2pt_shape_move(self, event, shape):
+        print(event, shape)
+        self.scene_view.delete('active')
+        x, y = event.x//10, event.y//10
+        points = self.shape_mapping[shape](*self.current_2pt_1st_pt, x, y)
+        for point in points:
+            self.draw_point(*point, ('active',))
+
+    def paint_2pt_shape_end(self, event, shape):
+        print(event, shape)
+        self.scene_view.delete('active')
+        x, y = event.x//10, event.y//10
+        points = self.shape_mapping[shape](*self.current_2pt_1st_pt, x, y)
+        for point in points:
+            self.draw_point(*point, (shape+'_'+str(self.current_paint_stroke)))
+        self.current_paint_stroke += 1
 
     def build_bottom_bar(self):
         self.shape_frame = tk.Frame(self.bottom_frame)
@@ -189,15 +216,21 @@ class Example(tk.Frame):
         self.snap_frame.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
 
         line_button = tk.Button(self.shape_frame, text='Line')
-        line_button.config(command=self.shape_func_generator('line', line_button))
+        line_button.config(command=self.shape_func_generator([partial(self.paint_2pt_shape_start, shape='line'),
+                                                                partial(self.paint_2pt_shape_move, shape='line'),
+                                                                partial(self.paint_2pt_shape_end, shape='line')], line_button))
         line_button.grid(row=0, column=0)
 
         rectangle_button = tk.Button(self.shape_frame, text='Rectangle')
-        rectangle_button.config(command=self.shape_func_generator('rectangle', rectangle_button))
+        rectangle_button.config(command=self.shape_func_generator([partial(self.paint_2pt_shape_start, shape='rectangle'),
+                                                                partial(self.paint_2pt_shape_move, shape='rectangle'),
+                                                                partial(self.paint_2pt_shape_end, shape='rectangle')], rectangle_button))
         rectangle_button.grid(row=1, column=0)
 
         circle_button = tk.Button(self.shape_frame, text='Circle')
-        circle_button.config(command=self.shape_func_generator('circle', circle_button))
+        circle_button.config(command=self.shape_func_generator([partial(self.paint_2pt_shape_start, shape='circle'),
+                                                                partial(self.paint_2pt_shape_move, shape='circle'),
+                                                                partial(self.paint_2pt_shape_end, shape='circle')], circle_button))
         circle_button.grid(row=0, column=1)
 
         ellipse_button = tk.Button(self.shape_frame, text='Ellipse')
