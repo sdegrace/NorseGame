@@ -76,6 +76,9 @@ def circle(x0, y0, x1, y1):
     radius = round(sqrt(abs(x1-x0)**2 + abs(y1-y0)**2))
     on_points = []
     on_points.append((x0, y0 + radius))
+    on_points.append((x0, y0 - radius))
+    on_points.append((x0 + radius, y0))
+    on_points.append((x0 - radius, y0))
 
     f = 1 - radius
     ddf_x = 1
@@ -126,19 +129,95 @@ def circle_center_from_3_points(x1, y1, x2, y2, x3, y3):
     c_y = by + g * vy
     return c_x, c_y
 
+def circle_pos(x0, y0, x1, y1):
+    radius = round(sqrt(abs(x1 - x0) ** 2 + abs(y1 - y0) ** 2))
+    if x1 < x0:
+        if y1 > y0:
+            if y1 < (y0 - radius/2):
+                pos = 7
+            else:
+                pos = 6
+        else:
+            if y1 > (y0 + radius/2):
+                pos = 5
+            else:
+                pos = 4
+    else:
+        if y1 > y0:
+            if y1 < (y0 - radius/2):
+                pos = 0
+            else:
+                pos = 1
+        else:
+            if y1 > (y0 + radius/2):
+                pos = 3
+            else:
+                pos = 2
+    return pos
+
+def is_multisection(x1, y1, x2, y2, start_pos, end_pos):
+    if start_pos != end_pos:
+        return True
+    else:
+        if start_pos in (0, 1):
+            return x1 < x2 | y1 < y2
+        elif start_pos in (2, 3):
+            return x1 > x2 | y1 < y2
+        elif start_pos in (4, 5):
+            return x1 > x2 | y1 > y2
+        else:
+            return x1 < x2 | y1 > y2
+
 def arc(x1, y1, x2, y2, x3, y3):
-    x0, y0 = circle_center_from_3_points(x1, y1, x2, y2, x3, y3)
+    center = circle_center_from_3_points(x1, y1, x2, y2, x3, y3)
+    if center is not None:
+        x0, y0 = center
+    else:
+        return line(x1, y1, x3, y3)
 
     radius = round(sqrt(abs(x1 - x0) ** 2 + abs(y1 - y0) ** 2))
-    on_points = []
-    on_points.append((x0, y0 + radius))
+    on_points = [(x1, y1), (x2, y2), (x3, y3)]
+
+    start_pos = circle_pos(x0, y0, x1, y1)
+    end_pos = circle_pos(x0, y0, x3, y3)
+    active_segments = []
+    multisection = is_multisection(x1, y1, x3, y3, start_pos, end_pos)
+    if multisection:
+        if start_pos != end_pos:
+            pos = start_pos
+            while pos != end_pos:
+                pos = (pos + 1) % 8
+                if pos == 0:
+                    on_points.append((x0, y0 - radius))
+                elif pos == 2:
+                    on_points.append((x0 + radius, y0))
+                elif pos == 3:
+                    on_points.append((x0, y0 + radius))
+                elif pos == 6:
+                    on_points.append((x0 - radius, y0))
+                active_segments.append(pos)
+    active_segments = active_segments[:-1]
+
+    start_met = False
+    end_met = False
+
+    segment_coord_mapping = {0: lambda x, y: (round(x0 + x), round(y0 - y)),
+                             1: lambda x, y: (round(x0 - y), round(y0 + x)),
+                             2: lambda x, y: (round(x0 + y), round(y0 + x)),
+                             3: lambda x, y: (round(x0 + x), round(y0 + y)),
+                             4: lambda x, y: (round(x0 - x), round(y0 + y)),
+                             5: lambda x, y: (round(x0 + y), round(y0 - x)),
+                             6: lambda x, y: (round(x0 - y), round(y0 - x)),
+                             7: lambda x, y: (round(x0 - x), round(y0 - y))
+                             }
 
     f = 1 - radius
     ddf_x = 1
     ddf_y = -2 * radius
     x = 0
     y = radius
-    while x < y:
+
+    while x < y and not (start_met and end_met):
         if f >= 0:
             y -= 1
             ddf_y += 2
@@ -146,106 +225,21 @@ def arc(x1, y1, x2, y2, x3, y3):
         x += 1
         ddf_x += 2
         f += ddf_x
-        on_points.append((x0 + x, y0 + y))
-    # f = 1 - radius
-    # ddf_x = 1
-    # ddf_y = -2 * radius
-    # x = 0
-    # y = radius
-    # while x < y:
-    #     if f >= 0:
-    #         y -= 1
-    #         ddf_y += 2
-    #         f += ddf_y
-    #     x += 1
-    #     ddf_x += 2
-    #     f += ddf_x
-    #     on_points.append((x0 - x, y0 + y))
-    # f = 1 - radius
-    # ddf_x = 1
-    # ddf_y = -2 * radius
-    # x = 0
-    # y = radius
-    # while x < y:
-    #     if f >= 0:
-    #         y -= 1
-    #         ddf_y += 2
-    #         f += ddf_y
-    #     x += 1
-    #     ddf_x += 2
-    #     f += ddf_x
-    #     on_points.append((x0 + x, y0 - y))
-    # f = 1 - radius
-    # ddf_x = 1
-    # ddf_y = -2 * radius
-    # x = 0
-    # y = radius
-    # while x < y:
-    #     if f >= 0:
-    #         y -= 1
-    #         ddf_y += 2
-    #         f += ddf_y
-    #     x += 1
-    #     ddf_x += 2
-    #     f += ddf_x
-    #     on_points.append((x0 - x, y0 - y))
-    # f = 1 - radius
-    # ddf_x = 1
-    # ddf_y = -2 * radius
-    # x = 0
-    # y = radius
-    # while x < y:
-    #     if f >= 0:
-    #         y -= 1
-    #         ddf_y += 2
-    #         f += ddf_y
-    #     x += 1
-    #     ddf_x += 2
-    #     f += ddf_x
-    #     on_points.append((x0 + y, y0 + x))
-    # f = 1 - radius
-    # ddf_x = 1
-    # ddf_y = -2 * radius
-    # x = 0
-    # y = radius
-    # while x < y:
-    #     if f >= 0:
-    #         y -= 1
-    #         ddf_y += 2
-    #         f += ddf_y
-    #     x += 1
-    #     ddf_x += 2
-    #     f += ddf_x
-    #     on_points.append((x0 - y, y0 + x))
-    #
-    # f = 1 - radius
-    # ddf_x = 1
-    # ddf_y = -2 * radius
-    # x = 0
-    # y = radius
-    # while x < y:
-    #     if f >= 0:
-    #         y -= 1
-    #         ddf_y += 2
-    #         f += ddf_y
-    #     x += 1
-    #     ddf_x += 2
-    #     f += ddf_x
-    #     on_points.append((x0 + y, y0 - x))
-    # f = 1 - radius
-    # ddf_x = 1
-    # ddf_y = -2 * radius
-    # x = 0
-    # y = radius
-    # while x < y:
-    #     if f >= 0:
-    #         y -= 1
-    #         ddf_y += 2
-    #         f += ddf_y
-    #     x += 1
-    #     ddf_x += 2
-    #     f += ddf_x
-    #     on_points.append((x0 - y, y0 - x))
+        for segment in active_segments:
+            on_points.append(segment_coord_mapping[segment](x, y))
+
+        start_segment_point = segment_coord_mapping[start_pos](x, y)
+        end_segment_point = segment_coord_mapping[end_pos](x, y)
+
+        if start_segment_point == (x1, y1):
+            start_met = True
+        if end_segment_point == (x3, y3):
+            end_met = True
+
+        if start_met:
+            on_points.append(start_segment_point)
+        if not end_met and multisection:
+            on_points.append(end_segment_point)
     return on_points
 
 

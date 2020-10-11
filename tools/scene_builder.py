@@ -21,6 +21,7 @@ class Example(tk.Frame):
 
     def __init__(self, root, scaling_factor=10):
         super().__init__()
+        self.root = root
         self.scaling_factor = scaling_factor
         default_button = tk.Button()
         self.fg_default = default_button.cget('foreground')
@@ -30,9 +31,11 @@ class Example(tk.Frame):
         self.active_shape_fg = self.fg_default
         self.active_shape_bg = self.bg_default
         self.current_2pt_1st_pt = None
+        self.current_3pt_1st_pt = None
+        self.current_3pt_2nd_pt = None
         self.current_bound_paint = do_nothing
         self.active_shape_button = None
-        self.root = root
+
         self.scene_view = None
         self.current_paint_stroke = 0
         self.current_scene = None
@@ -77,6 +80,7 @@ class Example(tk.Frame):
         self.scene_view_frame = tk.Frame(master=self)
         self.scene_view_frame.grid(row=0, column=1, padx=5, sticky=tk.E + tk.W + tk.S + tk.N)
 
+
         self.build_canvas()
 
     def build_canvas(self, max_x=100, max_y=100):
@@ -91,6 +95,8 @@ class Example(tk.Frame):
 
         self.scene_view.bind("<ButtonPress-2>", self.scroll_start)
         self.scene_view.bind("<B2-Motion>", self.scroll_move)
+        self.root.bind("<Control-z>", self.undo)
+        self.erasor_bind()
 
         self.xsb.grid(row=1, column=0, sticky="ew")
         self.ysb.grid(row=0, column=1, sticky="ns")
@@ -102,6 +108,7 @@ class Example(tk.Frame):
 
     def scroll_move(self, event):
         self.scene_view.scan_dragto(event.x, event.y, gain=1)
+
 
     def new(self):
         # filetypes = [('all files', '.*'), ('yamls', '.yaml')]
@@ -178,9 +185,10 @@ class Example(tk.Frame):
         self.draw_point(x, y, ('stroke_' + str(self.current_paint_stroke), 'freehand'))
 
     def paint_freehand_end(self, event):
-        self.current_paint_stroke += 1
         x, y = event.x//10, event.y//10
         self.draw_point(x, y, ('stroke_' + str(self.current_paint_stroke), 'freehand'))
+        self.current_paint_stroke += 1
+
 
 
     def paint_2pt_shape_start(self, event, shape):
@@ -202,8 +210,65 @@ class Example(tk.Frame):
         x, y = event.x//10, event.y//10
         points = self.shape_mapping[shape](*self.current_2pt_1st_pt, x, y)
         for point in points:
-            self.draw_point(*point, (shape+'_'+str(self.current_paint_stroke)))
+            self.draw_point(*point, (shape, 'stroke_'+str(self.current_paint_stroke)))
         self.current_paint_stroke += 1
+
+
+    def paint_3pt_shape_start(self, event, shape):
+        print(event, shape)
+        print(self.current_paint_stroke)
+        self.current_3pt_1st_pt = (event.x//10, event.y//10)
+
+    def paint_3pt_shape_move_1st(self, event, shape):
+        print(event, shape)
+        self.scene_view.delete('active')
+        x, y = event.x//10, event.y//10
+        points = line(*self.current_3pt_1st_pt, x, y)
+        for point in points:
+            self.draw_point(*point, ('active',))
+
+    def paint_3pt_shape_2nd_pt(self, event, shape):
+        print(event, shape)
+        self.scene_view.delete('active')
+        x, y = event.x//10, event.y//10
+        self.current_3pt_2nd_pt = (x, y)
+        points = line(*self.current_3pt_1st_pt, x, y)
+        for point in points:
+            self.draw_point(*point, ('active',))
+        self.scene_view.bind("<Motion>", partial(self.paint_3pt_shape_move_2nd, shape=shape))
+        self.scene_view.bind("<Button-1>", partial(self.paint_3pt_shape_end, shape=shape))
+
+
+    def paint_3pt_shape_move_2nd(self, event, shape):
+        x, y = event.x//10, event.y//10
+        self.scene_view.delete('active')
+        points = arc(*self.current_3pt_1st_pt, *self.current_3pt_2nd_pt, x, y)
+        for point in points:
+            self.draw_point(*point, ('active',))
+
+    def paint_3pt_shape_end(self, event, shape):
+        x, y = event.x//10, event.y//10
+        self.scene_view.delete('active')
+        points = arc(*self.current_3pt_1st_pt, *self.current_3pt_2nd_pt, x, y)
+        for point in points:
+            self.draw_point(*point, (shape, 'stroke_'+str(self.current_paint_stroke)))
+        self.current_paint_stroke += 1
+
+    def undo(self, event):
+        print('undo!')
+        if self.current_paint_stroke == 0:
+            return
+        self.current_paint_stroke -= 1
+        self.scene_view.delete('stroke_'+str(self.current_paint_stroke))
+
+    def erasor(self, event):
+        print('pressed!')
+        self.scene_view.delete(tk.CURRENT)
+
+    def erasor_bind(self):
+        self.scene_view.bind('<Button-3>', self.erasor)
+        self.scene_view.bind('<B3-Motion>', self.erasor)
+
 
     def build_bottom_bar(self):
         self.shape_frame = tk.Frame(self.bottom_frame)
@@ -238,8 +303,13 @@ class Example(tk.Frame):
         ellipse_button.grid(row=1, column=1)
 
         arc_button = tk.Button(self.shape_frame, text='Arc')
-        arc_button.config(command=self.shape_func_generator('arc', arc_button))
+        arc_button.config(command=self.shape_func_generator([partial(self.paint_3pt_shape_start, shape='arc'),
+                                                                partial(self.paint_3pt_shape_move_1st, shape='arc'),
+                                                                partial(self.paint_3pt_shape_2nd_pt, shape='arc')], arc_button))
         arc_button.grid(row=0, column=2)
+
+        ellipse_button.config(state=tk.DISABLED)
+        arc_button.config(state=tk.DISABLED)
 
         freehand_button = tk.Button(self.shape_frame, text='Freehand')
         freehand_button.config(command=self.shape_func_generator([self.paint_freehand_start,
@@ -248,6 +318,11 @@ class Example(tk.Frame):
         freehand_button.grid(row=1, column=2)
 
         self.shape_buttons = [line_button, rectangle_button, circle_button, ellipse_button, arc_button, freehand_button]
+
+        ttk.Separator(self.shape_frame, orient=tk.VERTICAL).grid(row=0, column=3, rowspan=2, sticky=tk.N+tk.S)
+
+        # delete_button = tk.Button(self.shape_frame, text='Delete')
+        # freehand_button.config(command=selection_fro.erasor_bind)
 
     def build_left_bar(self):
         self.left_mat_tab = tk.Frame(self.left_notebook)
