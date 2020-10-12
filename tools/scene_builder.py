@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import filedialog, simpledialog, messagebox
+from tkinter import filedialog, simpledialog, messagebox, colorchooser
 from tkinter import ttk
 import glob
 from math import ceil, floor, sqrt
@@ -51,6 +51,10 @@ class Example(tk.Frame):
         self.object_buttons = []
         self.material_buttons = []
         self.shape_buttons = []
+        self.master.title("Scene Builder")
+        self.pack(fill=tk.BOTH, expand=True)
+        self.columnconfigure(1, weight=1)
+        self.rowconfigure(0, weight=1)
         self.initUI()
         self.shape_mapping = {'circle': circle,
                               'line': line,
@@ -58,8 +62,6 @@ class Example(tk.Frame):
                               'arc': arc}
 
     def initUI(self):
-        self.master.title("Scene Builder")
-        self.pack(fill=tk.BOTH, expand=True)
         self.build_menu()
         # self.build_left_bar()
         # self.build_right_bar()
@@ -68,30 +70,26 @@ class Example(tk.Frame):
         self.bottom_frame.grid(row=1, column=0, columnspan=3, sticky=tk.E + tk.W + tk.S + tk.N)
         # tk.Label(master=self.bottom_frame, text='TEST', bg='red').pack(fill=tk.BOTH, expand=True)
 
-        self.columnconfigure(1, weight=1)
-        self.rowconfigure(0, weight=1)
-
         self.left_notebook = ttk.Notebook(self)
         self.left_notebook.grid(row=0, column=0, sticky=tk.E + tk.W + tk.S + tk.N)
 
         self.right_notebook = ttk.Notebook(self)
         self.right_notebook.grid(row=0, column=2, sticky=tk.E + tk.W + tk.S + tk.N)
 
-        self.scene_view_frame = tk.Frame(master=self)
-        self.scene_view_frame.grid(row=0, column=1, padx=5, sticky=tk.E + tk.W + tk.S + tk.N)
+        self.main_editor_frame = tk.Frame(master=self)
+        self.main_editor_frame.grid(row=0, column=1, padx=5, sticky=tk.E + tk.W + tk.S + tk.N)
 
-
-        self.build_canvas()
 
     def build_canvas(self, max_x=100, max_y=100):
         if self.scene_view is not None:
             self.scene_view.destroy()
-        self.scene_view = tk.Canvas(self.scene_view_frame, bg="white", width=max_x, height=max_y)
-        self.xsb = tk.Scrollbar(self.scene_view_frame, orient="horizontal", command=self.scene_view.xview)
-        self.ysb = tk.Scrollbar(self.scene_view_frame, orient="vertical", command=self.scene_view.yview)
+        # self.scene_view_frame.config(width=max_x, height=max_y)
+        self.scene_view = tk.Canvas(self.main_editor_frame, bg="white", width=max_x, height=max_y)
+        self.xsb = tk.Scrollbar(self.main_editor_frame, orient="horizontal", command=self.scene_view.xview)
+        self.ysb = tk.Scrollbar(self.main_editor_frame, orient="vertical", command=self.scene_view.yview)
         self.scene_view.configure(yscrollcommand=self.ysb.set, xscrollcommand=self.xsb.set)
         self.scene_view.configure(scrollregion=(0, 0, max_x, max_y))
-        self.scene_view.grid(row=0, column=0, sticky=tk.E + tk.W + tk.S + tk.N)
+        self.scene_view.grid(row=0, column=0)
 
         self.scene_view.bind("<ButtonPress-2>", self.scroll_start)
         self.scene_view.bind("<B2-Motion>", self.scroll_move)
@@ -100,8 +98,8 @@ class Example(tk.Frame):
 
         self.xsb.grid(row=1, column=0, sticky="ew")
         self.ysb.grid(row=0, column=1, sticky="ns")
-        self.scene_view_frame.grid_rowconfigure(0, weight=1)
-        self.scene_view_frame.grid_columnconfigure(0, weight=1)
+        self.main_editor_frame.grid_rowconfigure(0, weight=1)
+        self.main_editor_frame.grid_columnconfigure(0, weight=1)
 
     def scroll_start(self, event):
         self.scene_view.scan_mark(event.x, event.y)
@@ -110,7 +108,10 @@ class Example(tk.Frame):
         self.scene_view.scan_dragto(event.x, event.y, gain=1)
 
 
-    def new(self):
+    def new_scene(self):
+        for widget in self.winfo_children():
+            widget.destroy()
+        self.initUI()
         # filetypes = [('all files', '.*'), ('yamls', '.yaml')]
         # savepath = filedialog.asksaveasfilename(parent=self,
         #                                         initialdir='../game/data/',
@@ -127,14 +128,28 @@ class Example(tk.Frame):
         width = simpledialog.askfloat('Width', 'How wide will the scene be, in meters?', parent=self)
         length *= 10
         width *= 10
-        self.build_canvas(length * 10 + 5, width * 10 + 5)
+        self.build_canvas(length * 10, width * 10)
         self.current_scene = Scene(name, (ceil(length), ceil(width)))
-        img = ImageTk.PhotoImage(image=Image.fromarray(self.current_scene.layout))
-        self.scene_view.create_image((0, 0), anchor='nw', image=img)
-        self.scene_view.create_rectangle(0, 0, length * 10, width * 10)
+        # img = ImageTk.PhotoImage(image=Image.fromarray(self.current_scene.layout))
+        # self.scene_view.create_image((0, 0), anchor='nw', image=img)
         self.build_right_bar()
         self.build_left_bar()
         self.build_bottom_bar()
+
+    def new_material(self):
+        for widget in self.winfo_children():
+            widget.destroy()
+        self.initUI()
+
+    def new_object(self):
+        for widget in self.winfo_children():
+            widget.destroy()
+        self.initUI()
+
+    def build_from_array(self, img):
+        for y, row in enumerate(img):
+            for x, col in enumerate(row):
+                pass
 
     def build_right_materials(self):
         for i, (name, (activated, material, button)), in enumerate(self.materials.items()):
@@ -189,8 +204,6 @@ class Example(tk.Frame):
         self.draw_point(x, y, ('stroke_' + str(self.current_paint_stroke), 'freehand'))
         self.current_paint_stroke += 1
 
-
-
     def paint_2pt_shape_start(self, event, shape):
         print(event, shape)
         print(self.current_paint_stroke)
@@ -217,12 +230,12 @@ class Example(tk.Frame):
     def paint_3pt_shape_start(self, event, shape):
         print(event, shape)
         print(self.current_paint_stroke)
-        self.current_3pt_1st_pt = (event.x//10, event.y//10)
+        self.current_3pt_1st_pt = (event.x // 10, event.y // 10)
 
     def paint_3pt_shape_move_1st(self, event, shape):
         print(event, shape)
         self.scene_view.delete('active')
-        x, y = event.x//10, event.y//10
+        x, y = event.x // 10, event.y // 10
         points = line(*self.current_3pt_1st_pt, x, y)
         for point in points:
             self.draw_point(*point, ('active',))
@@ -230,7 +243,7 @@ class Example(tk.Frame):
     def paint_3pt_shape_2nd_pt(self, event, shape):
         print(event, shape)
         self.scene_view.delete('active')
-        x, y = event.x//10, event.y//10
+        x, y = event.x // 10, event.y // 10
         self.current_3pt_2nd_pt = (x, y)
         points = line(*self.current_3pt_1st_pt, x, y)
         for point in points:
@@ -238,20 +251,19 @@ class Example(tk.Frame):
         self.scene_view.bind("<Motion>", partial(self.paint_3pt_shape_move_2nd, shape=shape))
         self.scene_view.bind("<Button-1>", partial(self.paint_3pt_shape_end, shape=shape))
 
-
     def paint_3pt_shape_move_2nd(self, event, shape):
-        x, y = event.x//10, event.y//10
+        x, y = event.x // 10, event.y // 10
         self.scene_view.delete('active')
         points = arc(*self.current_3pt_1st_pt, *self.current_3pt_2nd_pt, x, y)
         for point in points:
             self.draw_point(*point, ('active',))
 
     def paint_3pt_shape_end(self, event, shape):
-        x, y = event.x//10, event.y//10
+        x, y = event.x // 10, event.y // 10
         self.scene_view.delete('active')
         points = arc(*self.current_3pt_1st_pt, *self.current_3pt_2nd_pt, x, y)
         for point in points:
-            self.draw_point(*point, (shape, 'stroke_'+str(self.current_paint_stroke)))
+            self.draw_point(*point, (shape, 'stroke_' + str(self.current_paint_stroke)))
         self.current_paint_stroke += 1
 
     def undo(self, event):
@@ -324,30 +336,32 @@ class Example(tk.Frame):
         # delete_button = tk.Button(self.shape_frame, text='Delete')
         # freehand_button.config(command=selection_fro.erasor_bind)
 
-    def build_left_bar(self):
-        self.left_mat_tab = tk.Frame(self.left_notebook)
+    def build_left_objects_notebook(self):
         self.left_obj_tab = tk.Frame(self.left_notebook)
-        self.left_notebook.add(self.left_mat_tab, text='Materials')
         self.left_notebook.add(self.left_obj_tab, text='Objects')
 
-        # self.label1 = ttk.Label(self.mat_tab, text='Materials').grid(row=1, column=1)
-        # self.label2 = ttk.Label(self.obj_tab, text='Objects').grid(row=1, column=1)
+    def build_left_materials_notebook(self):
+        self.left_mat_tab = tk.Frame(self.left_notebook)
+        self.left_notebook.add(self.left_mat_tab, text='Materials')
 
+    def build_left_materials(self):
         for name, (var, mat, button) in self.materials.items():
             if var.get():
                 check = tk.Checkbutton(master=self.left_mat_tab, text=name, variable=var)
                 check.pack(side=tk.TOP)
 
-    def build_right_bar(self):
+    def build_right_materials_notebook(self):
         self.right_mat_tab = tk.Frame(self.right_notebook)
-        self.right_obj_tab = tk.Frame(self.right_notebook)
         self.right_notebook.add(self.right_mat_tab, text='Materials')
-        self.right_notebook.add(self.right_obj_tab, text='Objects')
 
         self.build_right_materials()
-        # self.icon = tk.PhotoImage(file='../game/data/images/3dots.gif', width="50", height="50")
-        # button = tk.Button(self, image=self.icon)
-        # button.grid(row=0, column=1, pady=self.ICON_PADDING, padx=self.ICON_PADDING)
+
+    def build_right_objects_notebook(self):
+        self.right_obj_tab = tk.Frame(self.right_notebook)
+        self.right_notebook.add(self.right_obj_tab, text='Objects')
+        self.build_right_objects()
+
+    def build_right_objects(self):
         for i, icon in enumerate(glob.glob('../game/data/images/*')):
             col = i % 3
             row = i // 3
@@ -363,7 +377,9 @@ class Example(tk.Frame):
     def build_menu(self):
         self.menubar = tk.Menu(self)
         self.filemenu = tk.Menu(self.menubar, tearoff=0)
-        self.filemenu.add_command(label="New", command=self.new)
+        self.filemenu.add_command(label="New Scene", command=self.new_scene)
+        self.filemenu.add_command(label="New Object", command=self.new_object)
+        self.filemenu.add_command(label='New Material', command=self.new_material)
         self.filemenu.add_command(label="Open", command=do_nothing)
 
         self.filemenu.add_command(label="Save", command=do_nothing)
