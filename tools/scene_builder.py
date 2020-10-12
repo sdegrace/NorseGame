@@ -4,7 +4,7 @@ from tkinter import ttk
 from math import ceil, floor, sqrt
 from tools.image_processing_tools import *
 
-from tools.mixins import Painting, Panel, Canvas
+from tools.mixins import PaintingMixin, PanelMixin, CanvasMixin, MaterialMixin
 from game.lib.lib import Material, Scene
 
 
@@ -16,7 +16,7 @@ def do_nothing():
     pass
 
 
-class Example(tk.Frame, Painting, Panel, Canvas):
+class Example(tk.Frame, PaintingMixin, PanelMixin, CanvasMixin, MaterialMixin):
     ICON_PADDING = 4
 
     def __init__(self, root, scaling_factor=10):
@@ -60,15 +60,13 @@ class Example(tk.Frame, Painting, Panel, Canvas):
                               'line': line,
                               'rectangle': rectangle,
                               'arc': arc}
+        self.editor_type = None
 
     def init_UI(self):
         self.build_menu()
-        # self.build_left_bar()
-        # self.build_right_bar()
 
         self.bottom_frame = tk.Frame(master=self)
         self.bottom_frame.grid(row=1, column=0, columnspan=3, sticky=tk.E + tk.W + tk.S + tk.N)
-        # tk.Label(master=self.bottom_frame, text='TEST', bg='red').pack(fill=tk.BOTH, expand=True)
 
         self.left_notebook = ttk.Notebook(self)
         self.left_notebook.grid(row=0, column=0, sticky=tk.E + tk.W + tk.S + tk.N)
@@ -87,7 +85,7 @@ class Example(tk.Frame, Painting, Panel, Canvas):
         self.filemenu.add_command(label='New Material', command=self.new_material)
         self.filemenu.add_command(label="Open", command=do_nothing)
 
-        self.filemenu.add_command(label="Save", command=do_nothing)
+        self.filemenu.add_command(label="Save", command=self.save)
         self.filemenu.add_separator()
         self.filemenu.add_command(label="Exit", command=self.quit)
         self.menubar.add_cascade(label="File", menu=self.filemenu)
@@ -99,15 +97,26 @@ class Example(tk.Frame, Painting, Panel, Canvas):
 
         self.root.config(menu=self.menubar)
 
+    def save(self):
+        filename = filedialog.asksaveasfilename(defaultextension='yaml', filetypes=[('yaml', '.yaml')], initialdir='../game/data/')
+        with open(filename, mode='a') as file:
+            if self.editor_type == 'material':
+                self.save_material(file)
+            elif self.editor_type == 'scene':
+                self.save_scene(file)
+            elif self.editor_type == 'object':
+                self.save_object(file)
+
     def new_scene(self):
         for widget in self.winfo_children():
             widget.destroy()
         self.init_UI()
+        self.editor_type = 'scene'
         # filetypes = [('all files', '.*'), ('yamls', '.yaml')]
         # savepath = filedialog.asksaveasfilename(parent=self,
         #                                         initialdir='../game/data/',
         #                                         title="Please select a file to save the scene:")
-        if self.current_scene is not None and self.has_changes:
+        if self.current_scene is not None and self.current_paint_stroke > 0:
             response = messagebox.askyesno('Discard Changes?',
                                            '''If you create a new scene now, your existing changes will be discarded. 
                                            Do you really want to discard these changes?''')
@@ -123,14 +132,21 @@ class Example(tk.Frame, Painting, Panel, Canvas):
         self.current_scene = Scene(name, (ceil(length), ceil(width)))
         # img = ImageTk.PhotoImage(image=Image.fromarray(self.current_scene.layout))
         # self.scene_view.create_image((0, 0), anchor='nw', image=img)
-        self.build_right_bar()
-        self.build_left_bar()
+        self.build_left_materials_notebook()
+        self.build_left_objects_notebook()
+        self.build_left_materials()
+        self.build_right_materials_notebook()
+        self.build_right_objects_notebook()
+        self.build_right_materials()
+        self.build_right_objects()
         self.build_bottom_bar()
 
     def new_material(self):
         for widget in self.winfo_children():
             widget.destroy()
+        self.editor_type = 'material'
         self.init_UI()
+        self.build_material_editor()
 
     def new_object(self):
         for widget in self.winfo_children():

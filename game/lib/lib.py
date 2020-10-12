@@ -236,22 +236,22 @@ class Organ(GameObject):
 
 class Material(GameObject):
 
-    def __init__(self, name, density, compressive_yield, compressive_ult, tensile_yield=None, tensile_ult=None,
+    def __init__(self, name, density, compressive_yield=None, compressive_ult=None, tensile_yield=None, tensile_ult=None,
                  shear_yield=None, shear_ult=None, mod_of_elasticity=None, shear_modulus=None, strain_at_fracture=None,
                  color=None):
         super().__init__(_registry_lookup='Material_' + name)
         self.name = name
         self.color = color
-        self.density = density
-        self.compressive_yield = compressive_yield
-        self.compressive_ult = compressive_ult
-        self.tensile_yield = tensile_yield
-        self.tensile_ult = tensile_ult
-        self.shear_yield = shear_yield
-        self.shear_ult = shear_ult
-        self.mod_of_elasticity = mod_of_elasticity
-        self.shear_modulus = shear_modulus
-        self.strain_at_fracture = strain_at_fracture
+        self.density = float(density)
+        self.compressive_yield = float(compressive_yield) if compressive_yield is not None else None
+        self.compressive_ult = float(compressive_ult) if compressive_ult is not None else None
+        self.tensile_yield = float(tensile_yield) if tensile_yield is not None else None
+        self.tensile_ult = float(tensile_ult) if tensile_ult is not None else None
+        self.shear_yield = float(shear_yield) if shear_yield is not None else None
+        self.shear_ult = float(shear_ult) if shear_ult is not None else None
+        self.mod_of_elasticity = float(mod_of_elasticity) if mod_of_elasticity is not None else None
+        self.shear_modulus = float(shear_modulus) if shear_modulus is not None else None
+        self.strain_at_fracture = float(strain_at_fracture) if strain_at_fracture is not None else None
 
     @staticmethod
     def from_yaml(filename):
@@ -269,6 +269,20 @@ class Material(GameObject):
                         mat['mod_of_elasticity'], mat['shear_modulus'], mat['strain_at_fracture'], mat['color']
                     ))
         return materials
+
+    def to_yaml(self):
+        yaml_dict = {'name': self.name,
+                     'density': self.density,
+                     'tensile_ult': self.tensile_ult,
+                     'tensile_yield': self.tensile_yield,
+                     'compressive_yield': self.compressive_yield,
+                     'compressive_ult': self.compressive_ult,
+                     'mod_of_elasticity': self.mod_of_elasticity,
+                     'shear_modulus': self.shear_modulus,
+                     'strain_at_fracture': self.strain_at_fracture,
+                     'color': self.color}
+
+        return yaml.dump({key: var for key, var in yaml_dict.items() if var is not None})
 
 
 class Scene:
@@ -300,6 +314,9 @@ class Scene:
                 scenes.append(Scene(name=scene['name'], layout=im, material_mapping=scene['material_mapping']))
 
         return scenes
+
+    def to_yaml(self):
+        return yaml.dump({'name': self.name})
 
 class Game:
 

@@ -4,9 +4,83 @@ from functools import partial
 from tkinter import ttk
 from PIL import ImageTk, Image
 import glob
+from tkinter import colorchooser
+
+from game.lib.lib import Material
 
 
-class Canvas:
+
+class MaterialMixin:
+
+    def build_material_editor(self):
+        self.main_editor_frame.grid_columnconfigure(1, weight=1)
+        tk.Label(self.main_editor_frame, text='Name').grid(row=0, column=0)
+        tk.Label(self.main_editor_frame, text='Density').grid(row=1, column=0)
+        tk.Label(self.main_editor_frame, text='Ultimate Tensile Strength').grid(row=2, column=0)
+        tk.Label(self.main_editor_frame, text='Tensile Yield').grid(row=3, column=0)
+        tk.Label(self.main_editor_frame, text='Ultimate Compressive Strength').grid(row=4, column=0)
+        tk.Label(self.main_editor_frame, text='Compressive Yield').grid(row=5, column=0)
+        tk.Label(self.main_editor_frame, text='Ultimate Shear Strength').grid(row=6, column=0)
+        tk.Label(self.main_editor_frame, text='Shear Yield').grid(row=7, column=0)
+        tk.Label(self.main_editor_frame, text='Modulus of Elasticity').grid(row=8, column=0)
+        tk.Label(self.main_editor_frame, text='Shear Modulus').grid(row=9, column=0)
+        tk.Label(self.main_editor_frame, text='Strain at Fracture').grid(row=10, column=0)
+        tk.Label(self.main_editor_frame, text='Color').grid(row=11, column=0)
+
+        self.name = tk.Entry(self.main_editor_frame)
+        self.name.grid(row=0, column=1, sticky=tk.E+tk.W)
+        self.density = tk.Entry(self.main_editor_frame)
+        self.density.grid(row=1, column=1, sticky=tk.E+tk.W)
+        self.tensile_ult = tk.Entry(self.main_editor_frame)
+        self.tensile_ult.grid(row=2, column=1, sticky=tk.E+tk.W)
+        self.tensile_yield = tk.Entry(self.main_editor_frame)
+        self.tensile_yield.grid(row=3, column=1, sticky=tk.E+tk.W)
+        self.compressive_ult = tk.Entry(self.main_editor_frame)
+        self.compressive_ult.grid(row=4, column=1, sticky=tk.E+tk.W)
+        self.compressive_yield = tk.Entry(self.main_editor_frame)
+        self.compressive_yield.grid(row=5, column=1, sticky=tk.E+tk.W)
+        self.shear_ult = tk.Entry(self.main_editor_frame)
+        self.shear_ult.grid(row=6, column=1, sticky=tk.E+tk.W)
+        self.shear_yield = tk.Entry(self.main_editor_frame)
+        self.shear_yield.grid(row=7, column=1, sticky=tk.E+tk.W)
+        self.mod_of_elasticity = tk.Entry(self.main_editor_frame)
+        self.mod_of_elasticity.grid(row=8, column=1, sticky=tk.E+tk.W)
+        self.shear_modulus = tk.Entry(self.main_editor_frame)
+        self.shear_modulus.grid(row=9, column=1, sticky=tk.E+tk.W)
+        self.strain_at_fracture = tk.Entry(self.main_editor_frame)
+        self.strain_at_fracture.grid(row=10, column=1, sticky=tk.E+tk.W)
+        self.color_var = tk.StringVar()
+        self.color = tk.Entry(self.main_editor_frame, textvariable=self.color_var)
+        self.color.grid(row=11, column=1, sticky=tk.E+tk.W)
+
+        # self.incl_tensile_ult = tk.IntVar()
+        # check = tk.Checkbutton(self.main_editor_frame, text='Include?', variable=self.incl_tensile_ult).grid(row=2, column=2)
+        # check.select()
+        self.color_button = tk.Button(self.main_editor_frame, text='Select Color', command=self.select_color).grid(row=11, column=2)
+
+    def select_color(self):
+        color = colorchooser.askcolor(initialcolor=self.color_var.get() if self.color_var.get() else None)
+        self.color_var.set(color[1])
+
+    def save_material(self, file):
+        mat_dict = {'name': self.name.get(),
+                    'density': self.density.get(),
+                    'tensile_ult': self.tensile_ult.get(),
+                    'tensile_yield': self.tensile_yield.get(),
+                    'compressive_yield': self.compressive_yield.get(),
+                    'compressive_ult': self.compressive_ult.get(),
+                    'shear_yield': self.shear_yield.get(),
+                    'shear_ult': self.shear_ult.get(),
+                    'mod_of_elasticity': self.mod_of_elasticity.get(),
+                    'shear_modulus': self.shear_modulus.get(),
+                    'strain_at_fracture': self.strain_at_fracture.get(),
+                    'color': self.color_var.get()}
+
+
+        file.write(Material(**{key:var for key, var in mat_dict.items() if var}).to_yaml() + '---\n')
+
+
+class CanvasMixin:
 
     def build_canvas(self, max_x=100, max_y=100):
         if self.scene_view is not None:
@@ -44,7 +118,7 @@ class Canvas:
         self.scene_view.bind('<B3-Motion>', self.eraser)
 
 
-class Panel:
+class PanelMixin:
 
     def build_right_materials(self):
         for i, (name, (activated, material, button)), in enumerate(self.materials.items()):
@@ -185,7 +259,7 @@ class Panel:
         return func
 
 
-class Painting:
+class PaintingMixin:
 
     def draw_point(self, x, y, tags):
         self.scene_view.create_rectangle(x * 10, y * 10, (x + 1) * 10, (y + 1) * 10, fill=self.current_material.color,
