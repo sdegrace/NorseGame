@@ -44,6 +44,7 @@ class Example(tk.Frame, PaintingMixin, PanelMixin, CanvasMixin, MaterialMixin):
         self.active_shape_button = None
 
         self.scene_view = None
+        self.scene_size = None
         self.current_paint_stroke = 0
         self.current_scene = None
         self.has_changes = False
@@ -164,6 +165,14 @@ class Example(tk.Frame, PaintingMixin, PanelMixin, CanvasMixin, MaterialMixin):
             widget.destroy()
         self.init_UI()
 
+    def rebuild_img(self, event):
+        new_sf = int(event)
+        mult = new_sf / self.scaling_factor
+        self.scene_view.scale("all", mult, mult, 1*mult, 1*mult)
+        self.scene_size = [self.scene_size[0]*mult, self.scene_size[1]*mult]
+        self.scene_view.config(width=self.scene_size[0], height=self.scene_size[1])
+        self.scaling_factor = new_sf
+
     def build_from_array(self, img):
         for y, row in enumerate(img):
             for x, col in enumerate(row):
@@ -171,7 +180,7 @@ class Example(tk.Frame, PaintingMixin, PanelMixin, CanvasMixin, MaterialMixin):
                     self.scene_view.create_rectangle(x * self.scaling_factor, y * self.scaling_factor,
                                                      (x + 1) * self.scaling_factor, (y + 1) * self.scaling_factor,
                                                      fill=_from_rgb(col[:3]),
-                                                     tags='bitmap')
+                                                     tags=('bitmap', 'sf_'+str(self.scaling_factor)))
 
 
 def main():

@@ -87,6 +87,7 @@ class CanvasMixin:
             self.scene_view.destroy()
         # self.scene_view_frame.config(width=max_x, height=max_y)
         self.scene_view = tk.Canvas(self.main_editor_frame, bg="white", width=max_x, height=max_y)
+        self.scene_size = [max_x, max_y]
         self.xsb = tk.Scrollbar(self.main_editor_frame, orient="horizontal", command=self.scene_view.xview)
         self.ysb = tk.Scrollbar(self.main_editor_frame, orient="vertical", command=self.scene_view.yview)
         self.scene_view.configure(yscrollcommand=self.ysb.set, xscrollcommand=self.xsb.set)
@@ -186,6 +187,9 @@ class PanelMixin:
 
         ttk.Separator(self.shape_frame, orient=tk.VERTICAL).grid(row=0, column=3, rowspan=2, sticky=tk.N + tk.S)
 
+        scaling_factor_scale = tk.Scale(self.coord_frame, from_=1, to=200, orient=tk.HORIZONTAL, command=self.rebuild_img)
+        scaling_factor_scale.set(self.scaling_factor)
+        scaling_factor_scale.grid(row=1, column=0, columnspan=2, sticky=tk.E+tk.W)
         # delete_button = tk.Button(self.shape_frame, text='Delete')
         # freehand_button.config(command=selection_fro.erasor_bind)
 
@@ -265,7 +269,7 @@ class PaintingMixin:
         self.scene_view.create_rectangle(x * self.scaling_factor, y * self.scaling_factor,
                                          (x + 1) * self.scaling_factor, (y + 1) * self.scaling_factor,
                                          fill=self.current_material.color,
-                                         tags=tags)
+                                         tags=list(tags)+['sf_'+str(self.scaling_factor)])
         self.bitmap[y, x, :] = ImageColor.getcolor(self.current_material.color, 'RGBA')
 
     def paint_freehand_move(self, event):
