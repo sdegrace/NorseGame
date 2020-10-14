@@ -2,7 +2,7 @@ from tools.image_processing_tools import *
 import tkinter as tk
 from functools import partial
 from tkinter import ttk
-from PIL import ImageTk, Image
+from PIL import ImageTk, Image, ImageColor
 import glob
 from tkinter import colorchooser
 
@@ -262,32 +262,35 @@ class PanelMixin:
 class PaintingMixin:
 
     def draw_point(self, x, y, tags):
-        self.scene_view.create_rectangle(x * 10, y * 10, (x + 1) * 10, (y + 1) * 10, fill=self.current_material.color,
+        self.scene_view.create_rectangle(x * self.scaling_factor, y * self.scaling_factor,
+                                         (x + 1) * self.scaling_factor, (y + 1) * self.scaling_factor,
+                                         fill=self.current_material.color,
                                          tags=tags)
+        self.bitmap[y, x, :] = ImageColor.getcolor(self.current_material.color, 'RGBA')
 
     def paint_freehand_move(self, event):
         print(self.current_paint_stroke)
-        x, y = event.x // 10, event.y // 10
+        x, y = event.x // self.scaling_factor, event.y // self.scaling_factor
         self.draw_point(x, y, ('stroke_' + str(self.current_paint_stroke), 'freehand'))
 
     def paint_freehand_start(self, event):
-        x, y = event.x // 10, event.y // 10
+        x, y = event.x // self.scaling_factor, event.y // self.scaling_factor
         self.draw_point(x, y, ('stroke_' + str(self.current_paint_stroke), 'freehand'))
 
     def paint_freehand_end(self, event):
-        x, y = event.x // 10, event.y // 10
+        x, y = event.x // self.scaling_factor, event.y // self.scaling_factor
         self.draw_point(x, y, ('stroke_' + str(self.current_paint_stroke), 'freehand'))
         self.current_paint_stroke += 1
 
     def paint_2pt_shape_start(self, event, shape):
         print(event, shape)
         print(self.current_paint_stroke)
-        self.current_2pt_1st_pt = (event.x // 10, event.y // 10)
+        self.current_2pt_1st_pt = (event.x // self.scaling_factor, event.y // self.scaling_factor)
 
     def paint_2pt_shape_move(self, event, shape):
         print(event, shape)
         self.scene_view.delete('active')
-        x, y = event.x // 10, event.y // 10
+        x, y = event.x // self.scaling_factor, event.y // self.scaling_factor
         points = self.shape_mapping[shape](*self.current_2pt_1st_pt, x, y)
         for point in points:
             self.draw_point(*point, ('active',))
@@ -295,7 +298,7 @@ class PaintingMixin:
     def paint_2pt_shape_end(self, event, shape):
         print(event, shape)
         self.scene_view.delete('active')
-        x, y = event.x // 10, event.y // 10
+        x, y = event.x // self.scaling_factor, event.y // self.scaling_factor
         points = self.shape_mapping[shape](*self.current_2pt_1st_pt, x, y)
         for point in points:
             self.draw_point(*point, (shape, 'stroke_' + str(self.current_paint_stroke)))
@@ -304,12 +307,12 @@ class PaintingMixin:
     def paint_3pt_shape_start(self, event, shape):
         print(event, shape)
         print(self.current_paint_stroke)
-        self.current_3pt_1st_pt = (event.x // 10, event.y // 10)
+        self.current_3pt_1st_pt = (event.x // self.scaling_factor, event.y // self.scaling_factor)
 
     def paint_3pt_shape_move_1st(self, event, shape):
         print(event, shape)
         self.scene_view.delete('active')
-        x, y = event.x // 10, event.y // 10
+        x, y = event.x // self.scaling_factor, event.y // self.scaling_factor
         points = line(*self.current_3pt_1st_pt, x, y)
         for point in points:
             self.draw_point(*point, ('active',))
@@ -317,7 +320,7 @@ class PaintingMixin:
     def paint_3pt_shape_2nd_pt(self, event, shape):
         print(event, shape)
         self.scene_view.delete('active')
-        x, y = event.x // 10, event.y // 10
+        x, y = event.x // self.scaling_factor, event.y // self.scaling_factor
         self.current_3pt_2nd_pt = (x, y)
         points = line(*self.current_3pt_1st_pt, x, y)
         for point in points:
@@ -326,14 +329,14 @@ class PaintingMixin:
         self.scene_view.bind("<Button-1>", partial(self.paint_3pt_shape_end, shape=shape))
 
     def paint_3pt_shape_move_2nd(self, event, shape):
-        x, y = event.x // 10, event.y // 10
+        x, y = event.x // self.scaling_factor, event.y // self.scaling_factor
         self.scene_view.delete('active')
         points = arc(*self.current_3pt_1st_pt, *self.current_3pt_2nd_pt, x, y)
         for point in points:
             self.draw_point(*point, ('active',))
 
     def paint_3pt_shape_end(self, event, shape):
-        x, y = event.x // 10, event.y // 10
+        x, y = event.x // self.scaling_factor, event.y // self.scaling_factor
         self.scene_view.delete('active')
         points = arc(*self.current_3pt_1st_pt, *self.current_3pt_2nd_pt, x, y)
         for point in points:

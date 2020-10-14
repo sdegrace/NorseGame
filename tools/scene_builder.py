@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import filedialog, simpledialog, messagebox, colorchooser
 from tkinter import ttk
 from math import ceil, floor, sqrt
+import numpy as np
 from tools.image_processing_tools import *
 
 from tools.mixins import PaintingMixin, PanelMixin, CanvasMixin, MaterialMixin
@@ -14,6 +15,12 @@ def rounddown(x):
 
 def do_nothing():
     pass
+
+
+def _from_rgb(rgb):
+    """translates an rgb tuple of int to a tkinter friendly color code
+    """
+    return "#%02x%02x%02x" % rgb
 
 
 class Example(tk.Frame, PaintingMixin, PanelMixin, CanvasMixin, MaterialMixin):
@@ -45,6 +52,7 @@ class Example(tk.Frame, PaintingMixin, PanelMixin, CanvasMixin, MaterialMixin):
                           Material.from_yaml('../game/data/materials.yaml')}
         self.current_material = None
         self.current_object = None
+        self.bitmap = None
         for var, mat, button in self.materials.values():
             var.set(1)
         self.object_icons = []
@@ -126,10 +134,13 @@ class Example(tk.Frame, PaintingMixin, PanelMixin, CanvasMixin, MaterialMixin):
         name = simpledialog.askstring('Name', 'What is the name of the new scene?', parent=self)
         length = simpledialog.askfloat('Length', 'How long will the scene be, in meters?', parent=self)
         width = simpledialog.askfloat('Width', 'How wide will the scene be, in meters?', parent=self)
-        length *= 10
-        width *= 10
-        self.build_canvas(length * 10, width * 10)
-        self.current_scene = Scene(name, (ceil(length), ceil(width)))
+        self.grid_size = simpledialog.askinteger('Grid Size', 'How many centimeters per grid?', parent=self, initialvalue=100, minvalue=1)
+        length *= self.grid_size
+        width *= self.grid_size
+        length = round(length)
+        width = round(width)
+        self.bitmap = np.zeros((length, width, 4))
+        self.build_canvas(length*self.scaling_factor, width*self.scaling_factor)
         # img = ImageTk.PhotoImage(image=Image.fromarray(self.current_scene.layout))
         # self.scene_view.create_image((0, 0), anchor='nw', image=img)
         self.build_left_materials_notebook()
@@ -156,7 +167,11 @@ class Example(tk.Frame, PaintingMixin, PanelMixin, CanvasMixin, MaterialMixin):
     def build_from_array(self, img):
         for y, row in enumerate(img):
             for x, col in enumerate(row):
-                pass
+                if col[3] != 0:
+                    self.scene_view.create_rectangle(x * self.scaling_factor, y * self.scaling_factor,
+                                                     (x + 1) * self.scaling_factor, (y + 1) * self.scaling_factor,
+                                                     fill=_from_rgb(col[:3]),
+                                                     tags='bitmap')
 
 
 def main():
