@@ -4,6 +4,7 @@ from tkinter import ttk
 from math import ceil, floor, sqrt
 import numpy as np
 from tools.image_processing_tools import *
+from glob import glob
 
 from tools.mixins import PaintingMixin, PanelMixin, CanvasMixin, MaterialMixin
 from game.lib.lib import Material, Scene
@@ -49,13 +50,15 @@ class Example(tk.Frame, PaintingMixin, PanelMixin, CanvasMixin, MaterialMixin):
         self.current_scene = None
         self.has_changes = False
         self.current_draw_shape = None
-        self.materials = {mat.name: (tk.IntVar(), mat, None) for mat in
-                          Material.from_yaml('../game/data/materials.yaml')}
+        self.materials = {name:
+                              {mat.name: (mat, None) for mat in Material.from_yaml(name)}
+                          for name in glob('../game/data/materials/*.yaml')}
         self.current_material = None
         self.current_object = None
         self.bitmap = None
-        for var, mat, button in self.materials.values():
-            var.set(1)
+        # for mat_loc in self.materials.values():
+        #     for (var, mat, button) in mat_loc.values():
+        #         var.set(1)
         self.object_icons = []
         self.object_buttons = []
         self.material_buttons = []

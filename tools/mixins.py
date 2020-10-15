@@ -2,6 +2,7 @@ from tools.image_processing_tools import *
 import tkinter as tk
 from functools import partial
 from tkinter import ttk
+from ttkwidgets import CheckboxTreeview
 from PIL import ImageTk, Image, ImageColor
 import glob
 from tkinter import colorchooser
@@ -121,16 +122,24 @@ class CanvasMixin:
 
 class PanelMixin:
 
-    def build_right_materials(self):
-        for i, (name, (activated, material, button)), in enumerate(self.materials.items()):
-            if button is None:
-                button = tk.Button(master=self.right_mat_tab, text=name, bg=material.color,
-                                   fg=contrasting_text_color(material.color[1:]),
-                                   command=self.material_button_generator(material))
-            if activated:
-                button.grid(column=i % 3, row=i // 3, pady=self.ICON_PADDING, padx=self.ICON_PADDING)
-            else:
-                button.grid_forget()
+    def build_right_materials(self, *args, **kwargs):
+        for widget in self.right_mat_tab.winfo_children():
+            widget.destroy()
+
+        i = 0
+        for mat_loc in self.materials.values():
+            for (name, (material, button)) in mat_loc.items():
+        # for i, (name, (material, button)), in enumerate(self.materials.items()):
+                if button is None:
+                    button = tk.Button(master=self.right_mat_tab, text=name, bg=material.color,
+                                       fg=contrasting_text_color(material.color[1:]),
+                                       command=self.material_button_generator(material))
+                print(self.cbtv.get_checked())
+                if name in self.cbtv.get_checked():
+                    button.grid(column=i % 3, row=i // 3, pady=self.ICON_PADDING, padx=self.ICON_PADDING)
+                else:
+                    button.grid_forget()
+                i += 1
 
     def build_bottom_bar(self):
         self.shape_frame = tk.Frame(self.bottom_frame)
@@ -218,10 +227,17 @@ class PanelMixin:
         self.left_notebook.add(self.left_mat_tab, text='Materials')
 
     def build_left_materials(self):
-        for name, (var, mat, button) in self.materials.items():
-            if var.get():
-                check = tk.Checkbutton(master=self.left_mat_tab, text=name, variable=var)
-                check.pack(side=tk.TOP)
+        self.cbtv = CheckboxTreeview(master=self.left_mat_tab)
+        self.cbtv.pack()
+        for cat_name, mat_cat in self.materials.items():
+            self.cbtv.insert("", "end", cat_name, text=cat_name)
+            for name, (mat, button) in mat_cat.items():
+                self.cbtv.insert(cat_name, "end", name, text=name)
+                    # var = cb
+                    # check = tk.Checkbutton(master=self.left_mat_tab, text=name, variable=var)
+                    # check.pack(side=tk.TOP)
+        self.cbtv.bind('<<TreeviewSelect>>', self.build_right_materials)
+
 
     def build_right_materials_notebook(self):
         self.right_mat_tab = tk.Frame(self.right_notebook)

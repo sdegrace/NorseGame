@@ -27,7 +27,7 @@ def initialize_game():
 
 
 def initialize_materials(game=None):
-    materials = Material.from_yaml('data/materials.yaml')
+    materials = Material.from_yaml('data/metal_materials.yaml')
     for material in materials:
         game_object = game.register_object(material)
         game_object.build(game)
