@@ -83,8 +83,18 @@ class Example(tk.Frame, PaintingMixin, PanelMixin, CanvasMixin, MaterialMixin):
         self.right_notebook = ttk.Notebook(self)
         self.right_notebook.grid(row=0, column=2, sticky=tk.E + tk.W + tk.S + tk.N)
 
-        self.main_editor_frame = tk.Frame(master=self)
-        self.main_editor_frame.grid(row=0, column=1, padx=5, sticky=tk.E + tk.W + tk.S + tk.N)
+        self.main_notebook = ttk.Notebook(self)
+        self.main_notebook.grid(row=0, column=1, sticky=tk.E + tk.W + tk.S + tk.N)
+
+        self.main_editor_canvas_frame = tk.Frame(master=self.main_notebook)
+        self.main_editor_canvas_frame.grid(row=0, column=0, padx=5, sticky=tk.E + tk.W + tk.S + tk.N)
+
+        self.main_editor_entry_frame = tk.Frame(master=self.main_notebook)
+        self.main_editor_entry_frame.grid(row=0, column=0, padx=5, sticky=tk.E + tk.W + tk.S + tk.N)
+
+        self.main_notebook.add(self.main_editor_canvas_frame, text='Canvas')
+        self.main_notebook.add(self.main_editor_entry_frame, text='Data')
+
 
     def build_menu(self):
         self.menubar = tk.Menu(self)
@@ -140,7 +150,7 @@ class Example(tk.Frame, PaintingMixin, PanelMixin, CanvasMixin, MaterialMixin):
         width *= self.grid_size
         length = round(length)
         width = round(width)
-        self.bitmap = np.zeros((length, width, 4))
+        self.bitmap = np.zeros((length, width, 4), dtype=np.uint8)
         self.build_canvas(length*self.scaling_factor, width*self.scaling_factor)
         # img = ImageTk.PhotoImage(image=Image.fromarray(self.current_scene.layout))
         # self.scene_view.create_image((0, 0), anchor='nw', image=img)
@@ -164,9 +174,55 @@ class Example(tk.Frame, PaintingMixin, PanelMixin, CanvasMixin, MaterialMixin):
         for widget in self.winfo_children():
             widget.destroy()
         self.init_UI()
+        self.editor_type = 'object'
+        # filetypes = [('all files', '.*'), ('yamls', '.yaml')]
+        # savepath = filedialog.asksaveasfilename(parent=self,
+        #                                         initialdir='../game/data/',
+        #                                         title="Please select a file to save the scene:")
+        if self.current_scene is not None and self.current_paint_stroke > 0:
+            response = messagebox.askyesno('Discard Changes?',
+                                           '''If you create a new scene now, your existing changes will be discarded. 
+                                           Do you really want to discard these changes?''')
+            if not response:
+                return
 
-    def rebuild_img(self, event):
-        new_sf = int(event)
+        name = simpledialog.askstring('Name', 'What is the name of the new scene?', parent=self)
+        if name is None:
+            return
+        length = simpledialog.askfloat('Length', 'How long will the scene be, in meters?', parent=self)
+        if length is None:
+            return
+        width = simpledialog.askfloat('Width', 'How wide will the scene be, in meters?', parent=self)
+        if width is None:
+            return
+        self.grid_size = simpledialog.askinteger('Grid Size', 'Grid size in centimeters?', parent=self,
+                                                 initialvalue=100, minvalue=1)
+        if self.grid_size is None:
+            return
+        length *= self.grid_size
+        width *= self.grid_size
+        length = round(length)
+        width = round(width)
+        self.bitmap = np.zeros((length, width, 4))
+        self.build_canvas(length * self.scaling_factor, width * self.scaling_factor)
+        # img = ImageTk.PhotoImage(image=Image.fromarray(self.current_scene.layout))
+        # self.scene_view.create_image((0, 0), anchor='nw', image=img)
+        self.build_left_materials_notebook()
+        self.build_left_objects_notebook()
+        self.build_left_materials()
+        self.build_right_materials_notebook()
+        self.build_right_objects_notebook()
+        self.build_right_materials()
+        self.build_right_objects()
+        self.build_bottom_bar()
+
+    def zoom_in(self):
+        self.rebuild_img(self.scaling_factor * 2)
+
+    def zoom_out(self):
+        self.rebuild_img(self.scaling_factor // 2)
+
+    def rebuild_img(self, new_sf):
         mult = new_sf / self.scaling_factor
         self.scene_view.scale("all", mult, mult, 1*mult, 1*mult)
         self.scene_size = [self.scene_size[0]*mult, self.scene_size[1]*mult]

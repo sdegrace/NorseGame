@@ -13,50 +13,50 @@ from game.lib.lib import Material
 class MaterialMixin:
 
     def build_material_editor(self):
-        self.main_editor_frame.grid_columnconfigure(1, weight=1)
-        tk.Label(self.main_editor_frame, text='Name').grid(row=0, column=0)
-        tk.Label(self.main_editor_frame, text='Density').grid(row=1, column=0)
-        tk.Label(self.main_editor_frame, text='Ultimate Tensile Strength').grid(row=2, column=0)
-        tk.Label(self.main_editor_frame, text='Tensile Yield').grid(row=3, column=0)
-        tk.Label(self.main_editor_frame, text='Ultimate Compressive Strength').grid(row=4, column=0)
-        tk.Label(self.main_editor_frame, text='Compressive Yield').grid(row=5, column=0)
-        tk.Label(self.main_editor_frame, text='Ultimate Shear Strength').grid(row=6, column=0)
-        tk.Label(self.main_editor_frame, text='Shear Yield').grid(row=7, column=0)
-        tk.Label(self.main_editor_frame, text='Modulus of Elasticity').grid(row=8, column=0)
-        tk.Label(self.main_editor_frame, text='Shear Modulus').grid(row=9, column=0)
-        tk.Label(self.main_editor_frame, text='Strain at Fracture').grid(row=10, column=0)
-        tk.Label(self.main_editor_frame, text='Color').grid(row=11, column=0)
+        self.main_editor_entry_frame.grid_columnconfigure(1, weight=1)
+        tk.Label(self.main_editor_entry_frame, text='Name').grid(row=0, column=0)
+        tk.Label(self.main_editor_entry_frame, text='Density').grid(row=1, column=0)
+        tk.Label(self.main_editor_entry_frame, text='Ultimate Tensile Strength').grid(row=2, column=0)
+        tk.Label(self.main_editor_entry_frame, text='Tensile Yield').grid(row=3, column=0)
+        tk.Label(self.main_editor_entry_frame, text='Ultimate Compressive Strength').grid(row=4, column=0)
+        tk.Label(self.main_editor_entry_frame, text='Compressive Yield').grid(row=5, column=0)
+        tk.Label(self.main_editor_entry_frame, text='Ultimate Shear Strength').grid(row=6, column=0)
+        tk.Label(self.main_editor_entry_frame, text='Shear Yield').grid(row=7, column=0)
+        tk.Label(self.main_editor_entry_frame, text='Modulus of Elasticity').grid(row=8, column=0)
+        tk.Label(self.main_editor_entry_frame, text='Shear Modulus').grid(row=9, column=0)
+        tk.Label(self.main_editor_entry_frame, text='Strain at Fracture').grid(row=10, column=0)
+        tk.Label(self.main_editor_entry_frame, text='Color').grid(row=11, column=0)
 
-        self.name = tk.Entry(self.main_editor_frame)
+        self.name = tk.Entry(self.main_editor_entry_frame)
         self.name.grid(row=0, column=1, sticky=tk.E+tk.W)
-        self.density = tk.Entry(self.main_editor_frame)
+        self.density = tk.Entry(self.main_editor_entry_frame)
         self.density.grid(row=1, column=1, sticky=tk.E+tk.W)
-        self.tensile_ult = tk.Entry(self.main_editor_frame)
+        self.tensile_ult = tk.Entry(self.main_editor_entry_frame)
         self.tensile_ult.grid(row=2, column=1, sticky=tk.E+tk.W)
-        self.tensile_yield = tk.Entry(self.main_editor_frame)
+        self.tensile_yield = tk.Entry(self.main_editor_entry_frame)
         self.tensile_yield.grid(row=3, column=1, sticky=tk.E+tk.W)
-        self.compressive_ult = tk.Entry(self.main_editor_frame)
+        self.compressive_ult = tk.Entry(self.main_editor_entry_frame)
         self.compressive_ult.grid(row=4, column=1, sticky=tk.E+tk.W)
-        self.compressive_yield = tk.Entry(self.main_editor_frame)
+        self.compressive_yield = tk.Entry(self.main_editor_entry_frame)
         self.compressive_yield.grid(row=5, column=1, sticky=tk.E+tk.W)
-        self.shear_ult = tk.Entry(self.main_editor_frame)
+        self.shear_ult = tk.Entry(self.main_editor_entry_frame)
         self.shear_ult.grid(row=6, column=1, sticky=tk.E+tk.W)
-        self.shear_yield = tk.Entry(self.main_editor_frame)
+        self.shear_yield = tk.Entry(self.main_editor_entry_frame)
         self.shear_yield.grid(row=7, column=1, sticky=tk.E+tk.W)
-        self.mod_of_elasticity = tk.Entry(self.main_editor_frame)
+        self.mod_of_elasticity = tk.Entry(self.main_editor_entry_frame)
         self.mod_of_elasticity.grid(row=8, column=1, sticky=tk.E+tk.W)
-        self.shear_modulus = tk.Entry(self.main_editor_frame)
+        self.shear_modulus = tk.Entry(self.main_editor_entry_frame)
         self.shear_modulus.grid(row=9, column=1, sticky=tk.E+tk.W)
-        self.strain_at_fracture = tk.Entry(self.main_editor_frame)
+        self.strain_at_fracture = tk.Entry(self.main_editor_entry_frame)
         self.strain_at_fracture.grid(row=10, column=1, sticky=tk.E+tk.W)
         self.color_var = tk.StringVar()
-        self.color = tk.Entry(self.main_editor_frame, textvariable=self.color_var)
+        self.color = tk.Entry(self.main_editor_entry_frame, textvariable=self.color_var)
         self.color.grid(row=11, column=1, sticky=tk.E+tk.W)
 
         # self.incl_tensile_ult = tk.IntVar()
-        # check = tk.Checkbutton(self.main_editor_frame, text='Include?', variable=self.incl_tensile_ult).grid(row=2, column=2)
+        # check = tk.Checkbutton(self.main_editor_canvas_frame, text='Include?', variable=self.incl_tensile_ult).grid(row=2, column=2)
         # check.select()
-        self.color_button = tk.Button(self.main_editor_frame, text='Select Color', command=self.select_color).grid(row=11, column=2)
+        self.color_button = tk.Button(self.main_editor_entry_frame, text='Select Color', command=self.select_color).grid(row=11, column=2)
 
     def select_color(self):
         color = colorchooser.askcolor(initialcolor=self.color_var.get() if self.color_var.get() else None)
@@ -86,10 +86,10 @@ class CanvasMixin:
         if self.scene_view is not None:
             self.scene_view.destroy()
         # self.scene_view_frame.config(width=max_x, height=max_y)
-        self.scene_view = tk.Canvas(self.main_editor_frame, bg="white", width=max_x, height=max_y)
+        self.scene_view = tk.Canvas(self.main_editor_canvas_frame, bg="white", width=max_x, height=max_y)
         self.scene_size = [max_x, max_y]
-        self.xsb = tk.Scrollbar(self.main_editor_frame, orient="horizontal", command=self.scene_view.xview)
-        self.ysb = tk.Scrollbar(self.main_editor_frame, orient="vertical", command=self.scene_view.yview)
+        self.xsb = tk.Scrollbar(self.main_editor_canvas_frame, orient="horizontal", command=self.scene_view.xview)
+        self.ysb = tk.Scrollbar(self.main_editor_canvas_frame, orient="vertical", command=self.scene_view.yview)
         self.scene_view.configure(yscrollcommand=self.ysb.set, xscrollcommand=self.xsb.set)
         self.scene_view.configure(scrollregion=(0, 0, max_x, max_y))
         self.scene_view.grid(row=0, column=0)
@@ -101,8 +101,8 @@ class CanvasMixin:
 
         self.xsb.grid(row=1, column=0, sticky="ew")
         self.ysb.grid(row=0, column=1, sticky="ns")
-        self.main_editor_frame.grid_rowconfigure(0, weight=1)
-        self.main_editor_frame.grid_columnconfigure(0, weight=1)
+        self.main_editor_canvas_frame.grid_rowconfigure(0, weight=1)
+        self.main_editor_canvas_frame.grid_columnconfigure(0, weight=1)
 
     def scroll_start(self, event):
         self.scene_view.scan_mark(event.x, event.y)
@@ -186,12 +186,28 @@ class PanelMixin:
         self.shape_buttons = [line_button, rectangle_button, circle_button, ellipse_button, arc_button, freehand_button]
 
         ttk.Separator(self.shape_frame, orient=tk.VERTICAL).grid(row=0, column=3, rowspan=2, sticky=tk.N + tk.S)
+        self.increase_scaling_factor = tk.Button(self.coord_frame, text='Zoom In', command=self.zoom_in)
+        self.decrease_scaling_factor = tk.Button(self.coord_frame, text='Zoom Out', command=self.zoom_out)
+        self.increase_scaling_factor.grid(row=1, column=0)
+        self.decrease_scaling_factor.grid(row=1, column=1)
 
-        scaling_factor_scale = tk.Scale(self.coord_frame, from_=1, to=200, orient=tk.HORIZONTAL, command=self.rebuild_img)
-        scaling_factor_scale.set(self.scaling_factor)
-        scaling_factor_scale.grid(row=1, column=0, columnspan=2, sticky=tk.E+tk.W)
+        # self.scaling_factor_scale = tk.Scale(self.coord_frame, from_=1, to=20, orient=tk.HORIZONTAL, command=self.rebuild_img, repeatinterval=300)
+        # self.scaling_factor_scale.set(self.scaling_factor)
+        # self.scaling_factor_scale.grid(row=1, column=0, columnspan=2, sticky=tk.E+tk.W)
+        ttk.Separator(self.coord_frame, orient=tk.VERTICAL).grid(row=0, column=2, rowspan=2, sticky=tk.N + tk.S)
+        show_button = tk.Button(self.snap_frame, text='show', command=self.show_bitmap)
+        show_button.pack()
         # delete_button = tk.Button(self.shape_frame, text='Delete')
         # freehand_button.config(command=selection_fro.erasor_bind)
+    def show_bitmap(self):
+        print(self.bitmap)
+        top = tk.Toplevel()
+        img = Image.fromarray(self.bitmap)
+        img= img.convert('RGB')
+        img.show()
+        img = ImageTk.PhotoImage(image=img)
+        logolbl = tk.Label(top, image=img)
+        logolbl.grid()
 
     def build_left_objects_notebook(self):
         self.left_obj_tab = tk.Frame(self.left_notebook)
@@ -265,25 +281,28 @@ class PanelMixin:
 
 class PaintingMixin:
 
-    def draw_point(self, x, y, tags):
+    def draw_point(self, x, y, tags, save=False):
         self.scene_view.create_rectangle(x * self.scaling_factor, y * self.scaling_factor,
                                          (x + 1) * self.scaling_factor, (y + 1) * self.scaling_factor,
                                          fill=self.current_material.color,
                                          tags=list(tags)+['sf_'+str(self.scaling_factor)])
-        self.bitmap[y, x, :] = ImageColor.getcolor(self.current_material.color, 'RGBA')
+        if save:
+            self.bitmap[y, x, :] = ImageColor.getcolor(self.current_material.color, 'RGBA')
+            print(ImageColor.getcolor(self.current_material.color, 'RGBA'))
+        # self.bitmap[y, x, 3] = 255
 
     def paint_freehand_move(self, event):
         print(self.current_paint_stroke)
         x, y = event.x // self.scaling_factor, event.y // self.scaling_factor
-        self.draw_point(x, y, ('stroke_' + str(self.current_paint_stroke), 'freehand'))
+        self.draw_point(x, y, ('stroke_' + str(self.current_paint_stroke), 'freehand'), True)
 
     def paint_freehand_start(self, event):
         x, y = event.x // self.scaling_factor, event.y // self.scaling_factor
-        self.draw_point(x, y, ('stroke_' + str(self.current_paint_stroke), 'freehand'))
+        self.draw_point(x, y, ('stroke_' + str(self.current_paint_stroke), 'freehand'), True)
 
     def paint_freehand_end(self, event):
         x, y = event.x // self.scaling_factor, event.y // self.scaling_factor
-        self.draw_point(x, y, ('stroke_' + str(self.current_paint_stroke), 'freehand'))
+        self.draw_point(x, y, ('stroke_' + str(self.current_paint_stroke), 'freehand'), True)
         self.current_paint_stroke += 1
 
     def paint_2pt_shape_start(self, event, shape):
@@ -305,7 +324,7 @@ class PaintingMixin:
         x, y = event.x // self.scaling_factor, event.y // self.scaling_factor
         points = self.shape_mapping[shape](*self.current_2pt_1st_pt, x, y)
         for point in points:
-            self.draw_point(*point, (shape, 'stroke_' + str(self.current_paint_stroke)))
+            self.draw_point(*point, (shape, 'stroke_' + str(self.current_paint_stroke)), True)
         self.current_paint_stroke += 1
 
     def paint_3pt_shape_start(self, event, shape):
